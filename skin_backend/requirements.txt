@@ -1,0 +1,14 @@
+Django==5.2.7
+djangorestframework==3.16.1
+djangorestframework-simplejwt==5.5.1
+django-cors-headers==4.7.0
+python-dotenv==1.2.2
+Pillow==12.2.0
+google-genai==2.0.0
+numpy<2
+torch>=2.2,<2.4
+torchvision>=0.17,<0.19
+requests>=2.31,<3
+
+# PostgreSQL driver - потребен бидејќи DB_ENGINE=postgres во .env
+psycopg2-binary==2.9.12

@@ -1,0 +1,66 @@
+/* ── Settings Page ───────────────────────────────────────────────────────── */
+.settings-page { display: flex; flex-direction: column; gap: 22px; }
+
+.page-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.page-title    { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.page-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+/* Sections */
+.settings-sections { display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
+
+/* Card */
+.settings-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+}
+
+.settings-card-header {
+    padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
+}
+.settings-card-title { font-size: 14.5px; font-weight: 700; color: var(--text); }
+.settings-card-desc  { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+.settings-card-body {
+    padding: 18px 22px;
+    display: flex; flex-direction: column; gap: 14px;
+}
+
+.settings-divider { height: 1px; background: var(--border); }
+
+/* Option pills (language / theme) */
+.option-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.option-pill {
+    padding: 9px 18px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 9px;
+    font-size: 13px; font-weight: 500; color: var(--text-muted);
+    cursor: pointer; transition: all 0.15s;
+}
+.option-pill:hover { border-color: var(--primary); color: var(--text); }
+.option-pill--active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 700; }
+
+/* Toggle */
+.toggle-row {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 16px;
+}
+.toggle-label { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.toggle-sub   { font-size: 12px; color: var(--text-muted); }
+
+.toggle {
+    width: 42px; height: 24px; border-radius: 99px;
+    background: var(--surface2); border: 1px solid var(--border);
+    position: relative; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0; padding: 0;
+}
+.toggle--on { background: var(--primary); border-color: var(--primary); }
+.toggle-thumb {
+    position: absolute; top: 2px; left: 2px;
+    width: 18px; height: 18px; background: #fff;
+    border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    transition: left 0.2s;
+}
+.toggle--on .toggle-thumb { left: 20px; }

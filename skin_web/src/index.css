@@ -1,0 +1,104 @@
+/* ── DermaScanAI — Theme System ────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Shared tokens ──────────────────────────────────────────────────────────── */
+:root {
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
+
+    --sidebar-w: 232px;
+    --topbar-h:  64px;
+
+    --shadow-sm: 0 1px 4px rgba(16,21,28,0.06);
+    --shadow-md: 0 4px 16px rgba(16,21,28,0.10);
+}
+
+/* ── Light theme (default) ────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+    --bg:            #f5f6f9;
+    --surface:       #ffffff;
+    --surface2:      #eef0f4;
+    --border:        #e3e6ec;
+
+    --text:          #10151c;
+    --text-muted:    #626b7a;
+    --text-light:    #8a93a3;
+
+    --primary:       #5b4fe8;
+    --primary-soft:  #eeecfd;
+    --teal:          #0f9b8e;
+
+    --low:           #0f9b8e;
+    --low-bg:        #e3f6f3;
+
+    --med:           #b45309;
+    --med-bg:        #fdf1de;
+
+    --high:          #dc2626;
+    --high-bg:       #fce6e6;
+
+    --info:          #2563eb;
+    --info-bg:       #e6edfc;
+
+    --other:         #64748b;
+    --other-bg:      #eef0f3;
+
+    --shadow-sm: 0 1px 4px rgba(16,21,28,0.06);
+    --shadow-md: 0 4px 16px rgba(16,21,28,0.10);
+}
+
+/* ── Dark theme ────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+    --bg:            #0b0e14;
+    --surface:       #141924;
+    --surface2:      #1b2130;
+    --border:        #262d3d;
+
+    --text:          #eef1f7;
+    --text-muted:    #9aa5b8;
+    --text-light:    #6b7690;
+
+    --primary:       #8b81ff;
+    --primary-soft:  #241f4a;
+    --teal:          #2dd4c0;
+
+    --low:           #2dd4c0;
+    --low-bg:        #103330;
+
+    --med:           #fbbf24;
+    --med-bg:        #3a2c0d;
+
+    --high:          #f87171;
+    --high-bg:       #3a1414;
+
+    --info:          #60a5fa;
+    --info-bg:       #16233d;
+
+    --other:         #94a3b8;
+    --other-bg:      #1c2230;
+
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+html { font-size: 16px; }
+
+body {
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.2s, color 0.2s;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; border: none; }
+input, textarea, select { font-family: inherit; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }

@@ -1,0 +1,10 @@
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("scan-skin/", views.scan_skin, name="scan_skin"),
+    path("my-analyses/", views.my_analyses, name="my_analyses"),
+    path("<int:id>/", views.analysis_detail, name="analysis_detail"),
+    path("", views.list_analyses, name="list_analyses"),
+]

@@ -1,0 +1,34 @@
+{
+  "actinic_keratosis": {
+    "display_name": "Actinic Keratosis",
+    "severity": "MEDIUM"
+  },
+  "basal_cell_carcinoma": {
+    "display_name": "Basal Cell Carcinoma",
+    "severity": "HIGH"
+  },
+  "dermatofibroma": {
+    "display_name": "Dermatofibroma",
+    "severity": "LOW"
+  },
+  "melanoma": {
+    "display_name": "Melanoma",
+    "severity": "HIGH"
+  },
+  "nevus": {
+    "display_name": "Nevus (Mole)",
+    "severity": "LOW"
+  },
+  "seborrheic_keratosis": {
+    "display_name": "Seborrheic Keratosis",
+    "severity": "LOW"
+  },
+  "squamous_cell_carcinoma": {
+    "display_name": "Squamous Cell Carcinoma",
+    "severity": "HIGH"
+  },
+  "vascular_lesion": {
+    "display_name": "Vascular Lesion",
+    "severity": "LOW"
+  }
+}
