@@ -7,7 +7,7 @@ const api = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
-// Праќа JWT токен со секој request
+// Attaches the JWT token to every request
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('ss_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -18,8 +18,8 @@ api.interceptors.request.use((config) => {
 export const jwtAPI = {
     register:       (data) => api.post('/jwt-auth/register/', data),
     login:          (data) => api.post('/jwt-auth/login/', data),
-    refresh:        (data) => api.post('/jwt-auth/refresh/', data),   // refresh token во body
-    logout:         (data) => api.post('/jwt-auth/logout/', data),    // refresh token во body
+    refresh:        (data) => api.post('/jwt-auth/refresh/', data),   // refresh token in body
+    logout:         (data) => api.post('/jwt-auth/logout/', data),    // refresh token in body
     me:             ()     => api.get('/jwt-auth/me/'),
     changePassword: (data) => api.post('/jwt-auth/change-password/', data),
     resetPassword:  (data) => api.post('/jwt-auth/reset-password/', data),
@@ -64,6 +64,19 @@ export const recommendationsAPI = {
     delete:        (id)       => api.delete(`/recommendations/${id}/`),
 };
 
+// ── Dermatologists ────────────────────────────────────────────────────────────
+// Manually maintained list (never scraped) - GET is open to all logged-in
+// users (mobile/patient-web), mutations (create/update/delete) are admin-only
+// on the backend. Plain JSON, no image field, so no multipart here.
+export const dermatologistsAPI = {
+    getAll:        (params)   => api.get('/dermatologists/', { params }),
+    getById:       (id)       => api.get(`/dermatologists/${id}/`),
+    create:        (data)     => api.post('/dermatologists/', data),
+    update:        (id, data) => api.put(`/dermatologists/${id}/`, data),
+    partialUpdate: (id, data) => api.patch(`/dermatologists/${id}/`, data),
+    delete:        (id)       => api.delete(`/dermatologists/${id}/`),
+};
+
 // ── Analyses ──────────────────────────────────────────────────────────────────
 export const analysesAPI = {
     scanSkin:     (data) => api.post('/analyses/scan-skin/', data, {
@@ -72,6 +85,9 @@ export const analysesAPI = {
     getAll:       ()     => api.get('/analyses/'),
     getById:      (id)   => api.get(`/analyses/${id}/`),
     getMy:        ()     => api.get('/analyses/my-analyses/'),
+    // Chat Q&A for a specific analysis
+    getChat:      (id)       => api.get(`/analyses/${id}/chat/`),
+    sendChatMessage: (id, data) => api.post(`/analyses/${id}/chat/`, data),
 };
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
