@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../services/analysis_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/severity_pill.dart';
+import 'dermatologist_list_screen.dart';
 import 'scan/scan_flow_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -61,6 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildHeroWithCta(c, greetName),
               const SizedBox(height: 8),
               _buildRecentScans(c),
+              const SizedBox(height: 24),
+              _buildFindDermatologist(c),
               const SizedBox(height: 24),
               _buildTips(c),
               const SizedBox(height: 20),
@@ -279,6 +282,66 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFindDermatologist(AppColors c) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const DermatologistListScreen()),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: c.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: c.border),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: c.primarySoft,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(Icons.person_search_rounded, color: c.primary, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Find a dermatologist',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: c.text,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Browse our curated list',
+                        style: TextStyle(fontSize: 12.5, color: c.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios_rounded, color: c.textLight, size: 16),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
