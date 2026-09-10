@@ -14,7 +14,7 @@
 ///        python manage.py runserver 0.0.0.0:8000
 ///      (NOT just `runserver`) so it accepts connections from other
 ///      devices on the network, not only from localhost.
-const String kApiBaseUrl = 'http://192.168.0.19:8000/api';
+const String kApiBaseUrl = 'http://192.168.1.224:8000/api';
 
 /// Resolves a possibly-relative media path (e.g. the `image` field on an
 /// analysis, like `/media/analyses/xyz.png`) into a fully-qualified URL
