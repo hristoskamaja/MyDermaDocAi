@@ -6,6 +6,7 @@ import {
     X,
     FileText,
     Activity,
+    Stethoscope,
     ImageIcon,
     AlertTriangle,
     ClipboardList,
@@ -28,6 +29,7 @@ const EMPTY_FORM = {
     severity: 'MEDIUM',
     description: '',
     symptoms: '',
+    treatment_overview: '',
     image_description: '',
 };
 
@@ -292,6 +294,16 @@ function DetailDrawer({ condition, onEdit, onClose, t, onCountChange }) {
                         <p className="detail-text">{condition.symptoms}</p>
                     </div>
 
+                    {condition.treatment_overview && (
+                        <div className="detail-section">
+                            <div className="detail-section-title">
+                                <Stethoscope size={13} strokeWidth={1.8} />
+                                {t('conditions.treatmentOverview')}
+                            </div>
+                            <p className="detail-text">{condition.treatment_overview}</p>
+                        </div>
+                    )}
+
                     <div className="detail-section">
                         <div className="detail-section-title">
                             <ClipboardList size={13} strokeWidth={1.8} />
@@ -330,6 +342,7 @@ function FormModal({ condition, onSave, onClose, t }) {
                 severity:          condition.severity           || 'MEDIUM',
                 description:       condition.description        || '',
                 symptoms:          condition.symptoms           || '',
+                treatment_overview: condition.treatment_overview || '',
                 image_description: condition.image_description  || '',
             }
             : { ...EMPTY_FORM }
@@ -374,6 +387,7 @@ function FormModal({ condition, onSave, onClose, t }) {
         formData.append('severity',          form.severity);
         formData.append('description',       form.description);
         formData.append('symptoms',          form.symptoms);
+        formData.append('treatment_overview', form.treatment_overview);
         formData.append('image_description', form.image_description);
 
         if (imageFile) {
@@ -477,6 +491,20 @@ function FormModal({ condition, onSave, onClose, t }) {
                             onChange={(e) => set('symptoms', e.target.value)}
                         />
                         {errors.symptoms && <span className="form-error">{errors.symptoms}</span>}
+                    </div>
+
+                    {/* Treatment overview */}
+                    <div className="form-field">
+                        <label className="form-label">
+                            {t('conditions.treatmentOverview')}
+                            <span className="form-optional">({t('conditions.optional')})</span>
+                        </label>
+                        <textarea
+                            className="form-input form-textarea"
+                            rows={3}
+                            value={form.treatment_overview}
+                            onChange={(e) => set('treatment_overview', e.target.value)}
+                        />
                     </div>
 
                     {/* Image upload */}
