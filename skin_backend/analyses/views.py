@@ -9,14 +9,24 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import SkinCondition, Recommendation, ConditionRecommendation
-from .models import Analysis
-from .serializers import AnalysisListSerializer, AnalysisDetailSerializer
+from .models import Analysis, AnalysisChatMessage, ChatRole
+from .serializers import (
+    AnalysisListSerializer,
+    AnalysisDetailSerializer,
+    AnalysisChatMessageSerializer,
+)
 from .services.skin_model_service import predict_skin_condition, SkinModelPredictionError
-from .services.gemini_service import generate_recommendations_with_gemini
+from .services.gemini_service import (
+    generate_recommendations_with_gemini,
+    generate_chat_answer,
+)
+
+MAX_CHAT_HISTORY_MESSAGES = 10
+MAX_CHAT_QUESTION_LENGTH = 500
 
 
 # ---------------------------------------------------------------------------
-# HELPERS (истите како во leafscan: is_admin_user, can_access_analysis,
+# HELPERS (same as in leafscan: is_admin_user, can_access_analysis,
 # generate_analysis_key)
 # ---------------------------------------------------------------------------
 
@@ -78,9 +88,9 @@ def save_gemini_recommendations_for_condition(condition, recommendations_data):
 
 def generate_recommendations_only_if_missing(condition):
     """
-    Gemini се повикува само ако состојбата сеуште нема препораки зачувани -
-    исто како третманите во leafscan (не сакаме различни совети на секое
-    скенирање на истата состојба).
+    Gemini is only called if the condition doesn't already have saved
+    recommendations - same as the treatments in leafscan (we don't want
+    different advice on every scan of the same condition).
     """
 
     if not condition:
@@ -117,15 +127,15 @@ def generate_recommendations_only_if_missing(condition):
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def scan_skin(request):
     """
-    ГЛАВНИОТ endpoint - еквивалент на scan_plant() од leafscan.
+    THE MAIN endpoint - equivalent to scan_plant() from leafscan.
 
-    Тек: слика -> локален модел (skin_model_service) -> бара SkinCondition
-    по `key` -> зачувува Analysis -> генерира Gemini препораки (само прв пат
-    за таа состојба) -> враќа сè заедно.
+    Flow: image -> local model (skin_model_service) -> looks up SkinCondition
+    by `key` -> saves Analysis -> generates Gemini recommendations (only the
+    first time for that condition) -> returns everything together.
 
-    Додека analyses/services/ai_model/skin_model.pt сè уште не постои
-    (пред да го натренираш), ова ќе враќа 502 со јасна порака - тоа е
-    очекувано, не е баг.
+    While analyses/services/ai_model/skin_model.pt doesn't exist yet (before
+    you train it), this will return a 502 with a clear message - that's
+    expected, not a bug.
     """
 
     image = request.FILES.get("image")
@@ -232,3 +242,82 @@ def list_analyses(request):
     analyses = Analysis.objects.all().select_related("user", "condition").order_by("-created_at")
     serializer = AnalysisListSerializer(analyses, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ---------------------------------------------------------------------------
+# CHAT (Q&A for a specific analysis)
+# ---------------------------------------------------------------------------
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def analysis_chat(request, id):
+    analysis = get_object_or_404(
+        Analysis.objects.select_related("user", "condition"),
+        id=id,
+    )
+
+    if not can_access_analysis(request, analysis):
+        return Response(
+            {"detail": "You do not have permission to access this analysis."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    if request.method == "GET":
+        messages = analysis.chat_messages.all()
+        serializer = AnalysisChatMessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # POST - ask a new question
+    if not analysis.condition:
+        return Response(
+            {"detail": "This analysis has no associated condition to ask about."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    question = str(request.data.get("question", "")).strip()
+
+    if not question:
+        return Response(
+            {"question": "This field is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if len(question) > MAX_CHAT_QUESTION_LENGTH:
+        return Response(
+            {"question": f"Question is too long (max {MAX_CHAT_QUESTION_LENGTH} characters)."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    recent_messages = list(
+        analysis.chat_messages.order_by("-created_at")[:MAX_CHAT_HISTORY_MESSAGES]
+    )
+    recent_messages.reverse()
+    history = [{"role": m.role, "content": m.content} for m in recent_messages]
+
+    user_message = AnalysisChatMessage.objects.create(
+        analysis=analysis,
+        role=ChatRole.USER,
+        content=question,
+    )
+
+    answer_text = generate_chat_answer(
+        condition_name=analysis.condition.name,
+        severity=analysis.condition.severity or "MEDIUM",
+        description=analysis.condition.description,
+        history=history,
+        question=question,
+    )
+
+    assistant_message = AnalysisChatMessage.objects.create(
+        analysis=analysis,
+        role=ChatRole.ASSISTANT,
+        content=answer_text,
+    )
+
+    return Response(
+        {
+            "user_message": AnalysisChatMessageSerializer(user_message).data,
+            "assistant_message": AnalysisChatMessageSerializer(assistant_message).data,
+        },
+        status=status.HTTP_201_CREATED,
+    )

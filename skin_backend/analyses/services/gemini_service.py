@@ -1,27 +1,71 @@
 """
 gemini_service.py
 
-Исто како во leafscan: Gemini НЕ ја прави класификацијата (тоа го прави
-skin_model_service.py со локалниот модел). Gemini само генерира
-општи, читливи информации/совети за состојбата откако веќе е предвидена,
-и се повикува САМО еднаш по состојба (се кешира во базата преку
-ConditionRecommendation - гледај views.py -> generate_recommendations_only_if_missing).
+Same as in leafscan: Gemini does NOT do the classification (that's done by
+skin_model_service.py with the local model). Gemini only generates general,
+readable information/advice about the condition after it has already been
+predicted, and is called ONLY ONCE per condition (cached in the database via
+ConditionRecommendation - see views.py -> generate_recommendations_only_if_missing).
 
-РАЗЛИКА од leafscan (важно): наместо "третмани" (третманот на кожни
-лезии е медицинска работа - лекови, биопсија, операција - тоа НЕ треба AI
-да го препишува), овој промпт бара општи self-care/lifestyle совети И
-задолжително минимум еден совет од тип MEDICAL_CONSULT кој јасно
-препорачува преглед кај дерматолог. Апликацијата никогаш не смее да тврди
-дефинитивна дијагноза.
+DIFFERENCE from leafscan (important): instead of "treatments" (treating skin
+lesions is a medical matter - medication, biopsy, surgery - the AI must NOT
+prescribe that), this prompt asks for general self-care/lifestyle advice AND
+requires at least one recommendation of type MEDICAL_CONSULT that clearly
+recommends seeing a dermatologist. The app must never claim a definitive
+diagnosis.
 """
 
 import json
 import os
+import time
 from typing import List, Dict
 
 from google import genai
 from google.genai import types
 from google.genai.errors import APIError
+
+# "gemini-2.5-flash" was cut off by Google for new projects (full shutdown
+# planned for October 2026) - we use the "latest" alias instead of a fixed
+# version so the model doesn't need to be changed by hand every time Google
+# ships a new generation (Google gives 2 weeks notice before "latest" points
+# to a version with breaking changes).
+GEMINI_MODEL = "gemini-flash-latest"
+
+# HTTP statuses that mean "try again" (temporarily overloaded model /
+# rate limit), not a real error in our code or prompt.
+_RETRYABLE_STATUS_CODES = {429, 503}
+_MAX_ATTEMPTS = 3
+_RETRY_BACKOFF_SECONDS = 1.5
+
+
+def _generate_content_with_retry(client, prompt, config):
+    """
+    Same call as client.models.generate_content, but with a few automatic
+    retries on 429/503 (model temporarily overloaded - very common on the
+    free tier). After the last attempt, re-raises the real error so the
+    existing except blocks handle it exactly as before (fallback content).
+    """
+    last_error = None
+
+    for attempt in range(_MAX_ATTEMPTS):
+        try:
+            return client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=config,
+            )
+        except APIError as error:
+            last_error = error
+            status_code = getattr(error, "code", None)
+            is_last_attempt = attempt == _MAX_ATTEMPTS - 1
+
+            if status_code in _RETRYABLE_STATUS_CODES and not is_last_attempt:
+                time.sleep(_RETRY_BACKOFF_SECONDS * (attempt + 1))
+                continue
+
+            raise
+
+    raise last_error
 
 
 ALLOWED_RECOMMENDATION_TYPES = ["SELF_CARE", "MEDICAL_CONSULT", "LIFESTYLE"]
@@ -108,8 +152,8 @@ def validate_recommendations(recommendations: List[Dict]) -> List[Dict]:
         if len(valid_recommendations) >= 6:
             break
 
-    # ГАРАНЦИЈА: секогаш мора да има барем еден MEDICAL_CONSULT, дури и
-    # ако Gemini не врати таков (или врати неважечки JSON).
+    # GUARANTEE: there must always be at least one MEDICAL_CONSULT, even if
+    # Gemini doesn't return one (or returns invalid JSON).
     if type_counter["MEDICAL_CONSULT"] == 0:
         valid_recommendations.append(get_mandatory_medical_consult())
 
@@ -160,10 +204,10 @@ def generate_recommendations_with_gemini(
     )
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
+        response = _generate_content_with_retry(
+            client,
+            prompt,
+            types.GenerateContentConfig(
                 response_mime_type="application/json",
                 temperature=0.4,
             ),
@@ -208,3 +252,105 @@ def generate_recommendations_with_gemini(
             return get_fallback_recommendations(condition_name, severity)
 
         return []
+
+
+# ---------------------------------------------------------------------------
+# CHAT (Q&A for a specific analysis)
+#
+# Unlike generate_recommendations_with_gemini (called ONCE per condition and
+# cached in the database via ConditionRecommendation), the answers here are
+# NOT cached - each question is personal and different, so Gemini is called
+# on every question. The same safety rules apply: no diagnosis, no specific
+# medications/doses, always refer anything personal to a dermatologist.
+# ---------------------------------------------------------------------------
+
+CHAT_ANSWER_FALLBACK = (
+    "Sorry, I couldn't generate an answer right now. For any questions "
+    "about this result, please consult a licensed dermatologist."
+)
+
+
+def build_chat_prompt(
+    condition_name: str,
+    severity: str,
+    description: str,
+    history: List[Dict],
+    question: str,
+) -> str:
+    history_lines = []
+    for message in history:
+        speaker = "User" if message.get("role") == "USER" else "Assistant"
+        history_lines.append(f"{speaker}: {message.get('content', '')}")
+    history_text = "\n".join(history_lines) if history_lines else "(no previous messages)"
+
+    return f"""
+You are a dermatology information assistant answering a user's follow-up
+question about an AI-predicted skin condition detected from a photo in the
+DermaScanAI app.
+
+Condition: {condition_name}
+Severity category: {severity}
+General description: {description or "N/A"}
+
+Rules:
+- You are NOT a doctor. Never claim to provide a medical diagnosis, never
+  state with certainty what the user's lesion is, never recommend specific
+  medications, dosages, or personalized treatment plans.
+- Only answer questions related to this skin condition, general dermatology,
+  or skin health. If the question is unrelated to these topics, politely
+  decline and redirect the user back to the topic.
+- Keep answers concise and in plain, accessible language (roughly 2-5
+  sentences).
+- If the question implies urgency (bleeding, rapid change, pain) or the
+  severity category is HIGH, clearly recommend seeing a dermatologist soon.
+- Always keep in mind this is general educational information, not
+  personalized medical advice, and the AI prediction itself is only an
+  estimate, not a confirmed diagnosis.
+- Respond with plain text only - no JSON, no markdown formatting.
+
+Conversation so far:
+{history_text}
+
+New user question: {question}
+"""
+
+
+def generate_chat_answer(
+    condition_name: str,
+    severity: str,
+    description: str,
+    history: List[Dict],
+    question: str,
+) -> str:
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY is missing. Check your .env file.")
+
+    client = genai.Client(api_key=api_key)
+
+    prompt = build_chat_prompt(
+        condition_name=condition_name,
+        severity=severity,
+        description=description,
+        history=history,
+        question=question,
+    )
+
+    try:
+        response = _generate_content_with_retry(
+            client,
+            prompt,
+            types.GenerateContentConfig(temperature=0.4),
+        )
+
+        text = (response.text or "").strip()
+        return text if text else CHAT_ANSWER_FALLBACK
+
+    except APIError as error:
+        print(f"Gemini API error (chat): {error}")
+        return CHAT_ANSWER_FALLBACK
+
+    except Exception as error:
+        print(f"Unexpected Gemini chat error: {error}")
+        return CHAT_ANSWER_FALLBACK

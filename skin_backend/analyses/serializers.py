@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core.models import SkinCondition
-from .models import Analysis
+from .models import Analysis, AnalysisChatMessage
 
 
 class SkinConditionSerializer(serializers.ModelSerializer):
@@ -13,6 +13,7 @@ class SkinConditionSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "symptoms",
+            "treatment_overview",
             "severity",
             "category",
             "image",
@@ -49,5 +50,16 @@ class AnalysisDetailSerializer(serializers.ModelSerializer):
             "image",
             "confidence",
             "is_low_confidence",
+            "created_at",
+        ]
+
+
+class AnalysisChatMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnalysisChatMessage
+        fields = [
+            "id",
+            "role",
+            "content",
             "created_at",
         ]
