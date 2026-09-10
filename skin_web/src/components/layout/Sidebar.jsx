@@ -4,7 +4,7 @@ import { useLang } from '../../context/LanguageContext';
 import {
     LayoutDashboard, Stethoscope,
     Users, FlaskConical, BarChart2,
-    Settings, UserCircle, LogOut
+    Settings, UserCircle, LogOut, Contact
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -14,11 +14,12 @@ export default function Sidebar() {
     const navigate    = useNavigate();
 
     const NAV = [
-        { to: '/dashboard',  label: t('nav.dashboard'),  Icon: LayoutDashboard },
-        { to: '/conditions', label: t('nav.conditions'), Icon: Stethoscope     },
-        { to: '/users',      label: t('nav.users'),      Icon: Users           },
-        { to: '/analyses',   label: t('nav.analyses'),   Icon: FlaskConical    },
-        { to: '/statistics', label: t('nav.statistics'), Icon: BarChart2       },
+        { to: '/dashboard',      label: t('nav.dashboard'),      Icon: LayoutDashboard },
+        { to: '/conditions',     label: t('nav.conditions'),     Icon: Stethoscope     },
+        { to: '/dermatologists', label: t('nav.dermatologists'), Icon: Contact         },
+        { to: '/users',          label: t('nav.users'),          Icon: Users           },
+        { to: '/analyses',       label: t('nav.analyses'),       Icon: FlaskConical    },
+        { to: '/statistics',     label: t('nav.statistics'),     Icon: BarChart2       },
     ];
 
     const BOTTOM_NAV = [

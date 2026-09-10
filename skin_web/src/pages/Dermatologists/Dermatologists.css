@@ -1,0 +1,163 @@
+/* ── Dermatologists Page ──────────────────────────────────────────────────── */
+.dermatologists-page { display: flex; flex-direction: column; gap: 18px; }
+
+.page-header {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.page-title    { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.page-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+.dis-loading { padding: 60px 20px; text-align: center; color: var(--text-muted); font-size: 14px; }
+
+/* Buttons */
+.btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 18px; border-radius: 9px;
+    font-size: 13.5px; font-weight: 600; border: none;
+    cursor: pointer; transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
+}
+.btn:hover { opacity: 0.88; }
+.btn:active { transform: scale(0.97); }
+.btn--primary   { background: var(--primary); color: #fff; }
+.btn--secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn--danger    { background: var(--high);    color: #fff; }
+
+/* ── Card grid ────────────────────────────────────────────────────────────── */
+.derm-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.derm-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 13px; padding: 16px;
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.derm-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.derm-card-name { font-size: 14.5px; font-weight: 700; color: var(--text); }
+.derm-card-clinic { font-size: 12.5px; color: var(--text-muted); margin-top: -8px; }
+
+.derm-status-pill {
+    display: inline-flex; align-items: center; flex-shrink: 0;
+    padding: 3px 10px; border-radius: 99px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.2px;
+}
+.derm-status-pill--active   { background: var(--low-bg);  color: var(--low); }
+.derm-status-pill--inactive { background: var(--surface2); color: var(--text-muted); }
+
+.derm-card-details { display: flex; flex-direction: column; gap: 6px; }
+.derm-card-row {
+    display: flex; align-items: flex-start; gap: 7px;
+    font-size: 12.5px; color: var(--text-muted); line-height: 1.5;
+}
+.derm-card-row svg { flex-shrink: 0; margin-top: 2px; color: var(--text-light); }
+.derm-card-website { word-break: break-all; }
+
+.derm-card-footer {
+    display: flex; align-items: center; justify-content: flex-end;
+    margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--border);
+}
+.derm-card-actions { display: flex; gap: 6px; }
+
+/* Action buttons (edit / delete on cards) */
+.dis-action-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.15s; color: var(--text-muted);
+}
+.dis-action-btn--edit:hover   { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.dis-action-btn--delete:hover { background: var(--high-bg);   border-color: var(--high);  color: var(--high); }
+
+/* Empty state */
+.dis-empty {
+    padding: 60px 20px; text-align: center; display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-xl);
+}
+.dis-empty-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.dis-empty-sub   { font-size: 13px; color: var(--text-muted); max-width: 420px; }
+
+/* ── Modals (form / delete) ──────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(16,21,28,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999; padding: 16px;
+}
+.modal-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-xl); width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: var(--shadow-md); animation: modal-in 0.18s ease;
+}
+.modal-box--sm { max-width: 360px; }
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+}
+
+.modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
+
+.modal-close {
+    width: 32px; height: 32px; background: var(--surface2);
+    border: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); cursor: pointer; transition: background 0.15s;
+    flex-shrink: 0;
+}
+.modal-close:hover { background: var(--border); color: var(--text); }
+
+.modal-body  { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+.modal-footer {
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding: 16px 24px 20px; border-top: 1px solid var(--border);
+}
+
+/* Form fields */
+.form-field  { display: flex; flex-direction: column; gap: 6px; }
+.form-row    { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-label  { font-size: 13px; font-weight: 600; color: var(--text); }
+.form-input {
+    padding: 10px 13px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 9px;
+    font-size: 14px; color: var(--text); outline: none;
+    transition: border-color 0.15s; width: 100%;
+}
+.form-input:focus    { border-color: var(--primary); }
+.form-input--error   { border-color: var(--high) !important; }
+.form-textarea       { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-error          { font-size: 12px; color: var(--high); }
+.form-optional { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+
+/* Active toggle row */
+.derm-toggle-row {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 13.5px; color: var(--text); cursor: pointer;
+}
+.derm-toggle-row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+
+/* Delete modal */
+.modal-warn-icon {
+    width: 58px; height: 58px; background: var(--high-bg);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 26px auto 14px;
+}
+.modal-warn-title { font-size: 17px; font-weight: 700; color: var(--text); text-align: center; padding: 0 24px; }
+.modal-warn-desc  { font-size: 13px; color: var(--text-muted); text-align: center; line-height: 1.6; padding: 10px 24px 20px; }
+.modal-warn-desc strong { color: var(--text); }
+.modal-warn-actions { display: flex; gap: 10px; justify-content: center; padding: 0 24px 24px; }
+
+@media (max-width: 1200px) {
+    .derm-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+    .derm-grid { grid-template-columns: 1fr; }
+}
