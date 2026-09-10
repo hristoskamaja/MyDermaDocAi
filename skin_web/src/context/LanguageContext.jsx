@@ -21,6 +21,10 @@ const TRANSLATIONS = {
             settings:        'Settings',
             profile:         'Profile',
             logout:          'Log out',
+            scan:            'Scan',
+            history:         'History',
+            dermatologists:  'Dermatologists',
+            findDermatologist: 'Find a Dermatologist',
         },
 
         // ── Common ────────────────────────────────────────────────────────────────
@@ -112,6 +116,7 @@ const TRANSLATIONS = {
             key:               'Key',
             keyHint:           'Must match the AI model class name. Cannot be changed after creation.',
             symptoms:          'Symptoms',
+            treatmentOverview: 'Treatment Overview',
             recommendations:   'Recommendations',
             noConditionsTitle: 'No conditions found',
             noConditionsSub:   'Try adjusting your search or filter',
@@ -138,6 +143,42 @@ const TRANSLATIONS = {
             selfCare:    'Self Care',
             medical:     'Medical Consult',
             lifestyle:   'Lifestyle',
+        },
+
+        // ── Dermatologists (admin CRUD) ──────────────────────────────────────────
+        dermatologists: {
+            title:             'Dermatologists',
+            subtitle:          'Manually maintained directory of dermatologists shown to patients',
+            addBtn:            'Add Dermatologist',
+            searchPlaceholder: 'Search dermatologists…',
+            name:              'Name',
+            clinicName:        'Clinic Name',
+            city:              'City',
+            address:           'Address',
+            phone:             'Phone',
+            website:           'Website',
+            notes:             'Notes',
+            active:            'Active',
+            inactive:          'Inactive',
+            isActive:          'Visible to patients',
+            noDermatologistsTitle: 'No dermatologists yet',
+            noDermatologistsSub:   'Add the dermatologists you know about by hand — this list is never auto-populated.',
+            deleteTitle:       'Delete Dermatologist',
+            deleteDesc:        'Are you sure you want to delete',
+            deleteWarn:        'This cannot be undone.',
+            addTitle:          'Add Dermatologist',
+            editTitle:         'Edit Dermatologist',
+            optional:          'optional',
+        },
+
+        // ── Find a Dermatologist (patient-facing, read-only) ─────────────────────
+        findDermatologist: {
+            title:             'Find a Dermatologist',
+            subtitle:          'Dermatologists added by our team. Reach out directly to book an appointment.',
+            empty:             "Your admin hasn't added any dermatologists yet.",
+            emptySub:          'Check back later — this list is maintained by hand, not generated automatically.',
+            call:              'Call',
+            website:           'Visit website',
         },
 
         // ── Users ─────────────────────────────────────────────────────────────────
@@ -246,17 +287,93 @@ const TRANSLATIONS = {
             heroSub:           'AI-powered admin panel for managing conditions, users and analysis history.',
             headline:          'Clinical oversight for AI-assisted skin screening',
             headlineSub:       'Manage conditions, review analyses, and monitor model performance across your platform.',
+            noAccount:         "Don't have an account?",
+            signUpLink:        'Sign up',
+        },
+
+        // ── Register ──────────────────────────────────────────────────────────────
+        register: {
+            title:             'Create your account',
+            subtitle:          'Sign up to scan your skin and get AI-powered insights.',
+            fullNameLabel:     'Full name',
+            usernameLabel:     'Username',
+            usernameOptional:  'optional',
+            emailLabel:        'Email address',
+            passwordLabel:     'Password',
+            signUpBtn:         'Sign up',
+            signingUp:         'Creating account…',
+            errorEmpty:        'Please fill in all required fields.',
+            errorPwLength:     'Password must be at least 6 characters.',
+            haveAccount:       'Already have an account?',
+            signInLink:        'Sign in',
+            heroTitle:         'Know your skin better',
+            heroSub:           'Snap a photo of a skin concern and get an instant AI-powered assessment with care recommendations.',
+        },
+
+        // ── Scan ──────────────────────────────────────────────────────────────────
+        scan: {
+            title:             'Scan your skin',
+            subtitle:          'Take or upload a clear photo of the area you want checked.',
+            dropText:          'Drag & drop a photo here, or click to upload',
+            dropSub:           'PNG, JPG, WEBP up to 10MB',
+            changePhoto:       'Choose a different photo',
+            analyzeBtn:        'Analyze',
+            analyzing:         'Analyzing your photo…',
+            analyzingSub:      'This can take a few seconds.',
+            errorTitle:        'We could not analyze that photo',
+            errorGeneric:      'Something went wrong while analyzing your photo. Please try again.',
+            errorPredictionFailed: 'AI prediction failed. Please try again in a moment.',
+            errorConditionMissing: 'We detected a result that is not yet in our database. Please try again later.',
+            retry:             'Retry',
+            chooseDifferent:   'Choose a different photo',
+        },
+
+        // ── Scan Result ──────────────────────────────────────────────────────────
+        result: {
+            confidence:        'Confidence',
+            description:       'Description',
+            symptoms:          'Symptoms',
+            treatmentOverview: 'Treatment Overview',
+            seeADoctor:        'See a doctor',
+            selfCare:          'Self-care',
+            lifestyle:         'Lifestyle',
+            noRecommendations: 'No specific recommendations available for this condition.',
+            scanAgain:         'Scan again',
+            lowConfidenceWarn: 'Uncertain result — low model confidence. Consider a follow-up scan or professional review.',
+            backToHistory:     'Back to history',
+            findDermatologistLink: 'Find a dermatologist',
+        },
+
+        // ── History ───────────────────────────────────────────────────────────────
+        history: {
+            title:             'My Scan History',
+            subtitle:          'View all your previous skin scans',
+            empty:             'No scans yet',
+            emptySub:          'Your scan results will appear here once you analyze a photo.',
+            newScanBtn:        'New scan',
+            viewResult:        'View result',
+        },
+
+        // ── Chat ──────────────────────────────────────────────────────────────────
+        chat: {
+            title:             'Ask about this result',
+            subtitle:          'Ask a general question about this condition. This is AI-generated information, not a diagnosis or personal medical advice.',
+            placeholder:       'e.g. What could cause this to change?',
+            send:              'Send',
+            thinking:          'Thinking…',
+            errorGeneric:      'Something went wrong. Please try again.',
         },
 
         // ── Disclaimer ────────────────────────────────────────────────────────────
         disclaimer: {
             text: 'AI-generated results — not a substitute for professional medical diagnosis.',
+            resultText: 'AI-generated estimate — not a medical diagnosis. Always consult a dermatologist for concerning changes.',
         },
     },
 
     // ══════════════════════════════════════════════════════════════════════════
     mk: {
-        // ── Навигација ────────────────────────────────────────────────────────────
+        // ── Navigation ───────────────────────────────────────────────────────────
         nav: {
             dashboard:       'Контролна табла',
             analyses:        'Историја на анализи',
@@ -266,9 +383,13 @@ const TRANSLATIONS = {
             settings:        'Поставки',
             profile:         'Профил',
             logout:          'Одјава',
+            scan:            'Скенирај',
+            history:         'Историја',
+            dermatologists:  'Дерматолози',
+            findDermatologist: 'Најди дерматолог',
         },
 
-        // ── Општо ─────────────────────────────────────────────────────────────────
+        // ── Common ────────────────────────────────────────────────────────────────
         common: {
             save:            'Зачувај',
             cancel:          'Откажи',
@@ -296,7 +417,7 @@ const TRANSLATIONS = {
             create:          'Креирај',
         },
 
-        // ── Контролна табла ───────────────────────────────────────────────────────
+        // ── Dashboard ─────────────────────────────────────────────────────────────
         dashboard: {
             title:               'Контролна табла',
             subtitle:             'Добредојдовте, Администратор. Еве што се случува.',
@@ -317,7 +438,7 @@ const TRANSLATIONS = {
             quickStats:           'Брзи статистики',
         },
 
-        // ── Историја на анализи ───────────────────────────────────────────────────
+        // ── Analysis History ──────────────────────────────────────────────────────
         analyses: {
             title:             'Историја на анализи',
             subtitle:          'Прегледај ги сите претходни анализи на состојби на кожа',
@@ -341,7 +462,7 @@ const TRANSLATIONS = {
             uncertain:         'Несигурно',
         },
 
-        // ── Состојби ───────────────────────────────────────────────────────────────
+        // ── Conditions ────────────────────────────────────────────────────────────
         conditions: {
             title:             'Состојби',
             subtitle:          'Управувај со сите состојби на кожа во системот',
@@ -357,6 +478,7 @@ const TRANSLATIONS = {
             key:               'Клуч',
             keyHint:           'Мора да се совпаѓа со класата на AI моделот. Не може да се менува по креирање.',
             symptoms:          'Симптоми',
+            treatmentOverview: 'Преглед на третман',
             recommendations:   'Препораки',
             noConditionsTitle: 'Нема пронајдени состојби',
             noConditionsSub:   'Обидете се да ги прилагодите вашите филтри',
@@ -374,7 +496,7 @@ const TRANSLATIONS = {
             selectRecommendation: 'Изберете препорака…',
         },
 
-        // ── Препораки ─────────────────────────────────────────────────────────────
+        // ── Recommendations ───────────────────────────────────────────────────────
         recommendations: {
             title:       'Препораки',
             name:        'Име',
@@ -385,7 +507,43 @@ const TRANSLATIONS = {
             lifestyle:   'Начин на живот',
         },
 
-        // ── Корисници ─────────────────────────────────────────────────────────────
+        // ── Dermatologists (admin CRUD) ──────────────────────────────────────────
+        dermatologists: {
+            title:             'Дерматолози',
+            subtitle:          'Рачно одржуван именик на дерматолози прикажан на пациентите',
+            addBtn:            'Додај дерматолог',
+            searchPlaceholder: 'Пребарај дерматолози…',
+            name:              'Име',
+            clinicName:        'Име на клиника',
+            city:              'Град',
+            address:           'Адреса',
+            phone:             'Телефон',
+            website:           'Веб-страница',
+            notes:             'Белешки',
+            active:            'Активен',
+            inactive:          'Неактивен',
+            isActive:          'Видлив за пациенти',
+            noDermatologistsTitle: 'Сè уште нема дерматолози',
+            noDermatologistsSub:   'Додајте дерматолози што ги познавате рачно — оваа листа никогаш не се пополнува автоматски.',
+            deleteTitle:       'Избриши дерматолог',
+            deleteDesc:        'Дали сте сигурни дека сакате да го избришете',
+            deleteWarn:        'Ова не може да се поврати.',
+            addTitle:          'Додај дерматолог',
+            editTitle:         'Уреди дерматолог',
+            optional:          'опционално',
+        },
+
+        // ── Find a Dermatologist (patient-facing, read-only) ─────────────────────
+        findDermatologist: {
+            title:             'Најди дерматолог',
+            subtitle:          'Дерматолози додадени од нашиот тим. Контактирајте директно за да закажете преглед.',
+            empty:             'Вашиот администратор сè уште нема додадено дерматолози.',
+            emptySub:          'Проверете повторно подоцна — оваа листа се одржува рачно, не се генерира автоматски.',
+            call:              'Јави се',
+            website:           'Посети веб-страница',
+        },
+
+        // ── Users ─────────────────────────────────────────────────────────────────
         users: {
             title:             'Корисници',
             subtitle:          'Управувај со сите регистрирани корисници',
@@ -408,7 +566,7 @@ const TRANSLATIONS = {
             username:          'Корисничко име',
         },
 
-        // ── Статистики ────────────────────────────────────────────────────────────
+        // ── Statistics ────────────────────────────────────────────────────────────
         statistics: {
             title:             'Статистики',
             subtitle:          'Аналитика и увиди за платформата',
@@ -426,7 +584,7 @@ const TRANSLATIONS = {
             detectionAccuracy: 'Точност на детекција',
         },
 
-        // ── Поставки ──────────────────────────────────────────────────────────────
+        // ── Settings ──────────────────────────────────────────────────────────────
         settings: {
             title:             'Општи поставки',
             subtitle:          'Системски преференци за административниот панел',
@@ -453,7 +611,7 @@ const TRANSLATIONS = {
             lightMode:         'Светол режим',
         },
 
-        // ── Профил ────────────────────────────────────────────────────────────────
+        // ── Profile ───────────────────────────────────────────────────────────────
         profile: {
             title:             'Администраторски профил',
             subtitle:          'Управувај со личните информации и лозинката',
@@ -473,7 +631,7 @@ const TRANSLATIONS = {
             pwErrorMatch:      'Новите лозинки не се совпаѓаат.',
         },
 
-        // ── Најава ────────────────────────────────────────────────────────────────
+        // ── Login ─────────────────────────────────────────────────────────────────
         login: {
             title:             'Администраторска најава',
             subtitle:          'Најавете се на вашата администраторска сметка',
@@ -491,11 +649,87 @@ const TRANSLATIONS = {
             heroSub:           'AI-базиран административен панел за управување со состојби, корисници и историја на анализи.',
             headline:          'Клинички надзор за AI-асистирано скенирање на кожа',
             headlineSub:       'Управувајте со состојби, прегледувајте анализи и следете ги перформансите на моделот низ вашата платформа.',
+            noAccount:         'Немате сметка?',
+            signUpLink:        'Регистрирај се',
         },
 
-        // ── Одрекување ────────────────────────────────────────────────────────────
+        // ── Register ──────────────────────────────────────────────────────────────
+        register: {
+            title:             'Креирај сметка',
+            subtitle:          'Регистрирај се за да го скенираш твојот проблем на кожата и добиеш AI увиди.',
+            fullNameLabel:     'Целосно име',
+            usernameLabel:     'Корисничко име',
+            usernameOptional:  'опционално',
+            emailLabel:        'Е-пошта адреса',
+            passwordLabel:     'Лозинка',
+            signUpBtn:         'Регистрирај се',
+            signingUp:         'Се креира сметка…',
+            errorEmpty:        'Ве молиме пополнете ги сите задолжителни полиња.',
+            errorPwLength:     'Лозинката мора да содржи најмалку 6 знаци.',
+            haveAccount:       'Веќе имате сметка?',
+            signInLink:        'Најави се',
+            heroTitle:         'Запознај ја твојата кожа подобро',
+            heroSub:           'Сликај ја проблематичната зона и добиј моментална AI проценка со препораки за нега.',
+        },
+
+        // ── Scan ──────────────────────────────────────────────────────────────────
+        scan: {
+            title:             'Скенирај ја твојата кожа',
+            subtitle:          'Сликај или прикачи јасна фотографија на делот кој сакаш да го провериш.',
+            dropText:          'Повлечи и пушти слика тука, или кликни за прикачување',
+            dropSub:           'PNG, JPG, WEBP до 10MB',
+            changePhoto:       'Избери друга слика',
+            analyzeBtn:        'Анализирај',
+            analyzing:         'Ја анализираме твојата слика…',
+            analyzingSub:      'Ова може да потрае неколку секунди.',
+            errorTitle:        'Не можевме да ја анализираме сликата',
+            errorGeneric:      'Нешто тргна наопаку при анализата на сликата. Обиди се повторно.',
+            errorPredictionFailed: 'AI предвидувањето не успеа. Обидете се повторно за момент.',
+            errorConditionMissing: 'Детектиравме резултат кој сè уште не е во нашата база. Обидете се подоцна.',
+            retry:             'Обиди се повторно',
+            chooseDifferent:   'Избери друга слика',
+        },
+
+        // ── Scan Result ──────────────────────────────────────────────────────────
+        result: {
+            confidence:        'Доверливост',
+            description:       'Опис',
+            symptoms:          'Симптоми',
+            treatmentOverview: 'Преглед на третман',
+            seeADoctor:        'Посети лекар',
+            selfCare:          'Само-нега',
+            lifestyle:         'Начин на живот',
+            noRecommendations: 'Нема специфични препораки достапни за оваа состојба.',
+            scanAgain:         'Скенирај повторно',
+            lowConfidenceWarn: 'Несигурен резултат — ниска доверливост на моделот. Разгледајте повторно скенирање или стручен преглед.',
+            backToHistory:     'Назад кон историјата',
+            findDermatologistLink: 'Најди дерматолог',
+        },
+
+        // ── History ───────────────────────────────────────────────────────────────
+        history: {
+            title:             'Моја историја на скенирања',
+            subtitle:          'Прегледај ги сите твои претходни скенирања на кожа',
+            empty:             'Сè уште нема скенирања',
+            emptySub:          'Твоите резултати ќе се појават тука откако ќе анализираш слика.',
+            newScanBtn:        'Ново скенирање',
+            viewResult:        'Прикажи резултат',
+        },
+
+        // ── Chat ──────────────────────────────────────────────────────────────────
+        chat: {
+            title:             'Прашај за овој резултат',
+            subtitle:          'Постави општо прашање за оваа состојба. Ова е AI-генерирана информација, не дијагноза или лична медицинска советница.',
+            placeholder:       'на пр. Што може да предизвика ова да се промени?',
+            send:              'Испрати',
+            thinking:          'Размислува…',
+            errorGeneric:      'Нешто тргна наопаку. Обиди се повторно.',
+        },
+
+        // ── Disclaimer ────────────────────────────────────────────────────────────
         disclaimer: {
             text: 'Резултати генерирани со AI — не претставуваат замена за професионална медицинска дијагноза.',
+            resultText: 'AI-генерирана проценка — не претставува медицинска дијагноза. Секогаш консултирајте се со дерматолог за загрижувачки промени.',
         },
     },
 };
