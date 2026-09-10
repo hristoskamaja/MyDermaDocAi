@@ -155,6 +155,18 @@
 }
 .login-forgot:hover { opacity: 0.75; }
 
+.login-register-prompt {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+.login-register-link {
+    color: var(--primary);
+    font-weight: 700;
+}
+.login-register-link:hover { opacity: 0.8; }
+
 @media (max-width: 900px) {
     .login-hero { display: none; }
     .login-form-panel { width: 100%; }

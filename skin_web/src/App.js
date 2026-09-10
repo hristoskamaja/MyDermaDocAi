@@ -3,35 +3,73 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import AdminLayout from './components/layout/AdminLayout';
+import PatientLayout from './components/layout/PatientLayout';
 import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Conditions from './pages/Conditions/Conditions';
+import Dermatologists from './pages/Dermatologists/Dermatologists';
 import Users from './pages/Users/Users';
 import AnalysisHistory from './pages/AnalysisHistory/AnalysisHistory';
 import Statistics from './pages/Statistics/Statistics';
 import Settings from './pages/Settings/Settings';
 import Profile from './pages/Profile/Profile';
+import Scan from './pages/Scan/Scan';
+import ScanResult from './pages/Scan/ScanResult';
+import History from './pages/History/History';
+import FindDermatologist from './pages/FindDermatologist/FindDermatologist';
 
 function PrivateRoute({ children }) {
     const { isAuthenticated } = useAuth();
     return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
+// Admin-only pages redirect a regular USER to the patient area instead of
+// rendering. Admins are never restricted from the patient-facing pages.
+function AdminOnly({ children }) {
+    const { user } = useAuth();
+    return user?.role === 'ADMIN' ? children : <Navigate to="/scan" replace />;
+}
+
+// Picks the right shell for the logged-in user's role. A USER account never
+// mounts AdminLayout (or anything inside it) — it always gets PatientLayout.
+function RoleLayout() {
+    const { user } = useAuth();
+    return user?.role === 'ADMIN' ? <AdminLayout /> : <PatientLayout />;
+}
+
+function HomeRedirect() {
+    const { user } = useAuth();
+    return <Navigate to={user?.role === 'ADMIN' ? '/dashboard' : '/scan'} replace />;
+}
+
 function AppRoutes() {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
-                <Route index        element={<Navigate to="/dashboard" replace />} />
-                <Route path="dashboard"  element={<Dashboard />} />
-                <Route path="conditions" element={<Conditions />} />
-                <Route path="users"      element={<Users />} />
-                <Route path="analyses"   element={<AnalysisHistory />} />
-                <Route path="statistics" element={<Statistics />} />
-                <Route path="settings"   element={<Settings />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<PrivateRoute><RoleLayout /></PrivateRoute>}>
+                <Route index        element={<HomeRedirect />} />
+
+                {/* Admin-only */}
+                <Route path="dashboard"      element={<AdminOnly><Dashboard /></AdminOnly>} />
+                <Route path="conditions"     element={<AdminOnly><Conditions /></AdminOnly>} />
+                <Route path="dermatologists" element={<AdminOnly><Dermatologists /></AdminOnly>} />
+                <Route path="users"          element={<AdminOnly><Users /></AdminOnly>} />
+                <Route path="analyses"       element={<AdminOnly><AnalysisHistory /></AdminOnly>} />
+                <Route path="statistics"     element={<AdminOnly><Statistics /></AdminOnly>} />
+                <Route path="settings"       element={<AdminOnly><Settings /></AdminOnly>} />
+
+                {/* Shared */}
                 <Route path="profile"    element={<Profile />} />
+
+                {/* Patient-facing (admins may view these too, just unrestricted) */}
+                <Route path="scan"           element={<Scan />} />
+                <Route path="scan/:id"       element={<ScanResult />} />
+                <Route path="history"        element={<History />} />
+                <Route path="find-dermatologist" element={<FindDermatologist />} />
             </Route>
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
 }

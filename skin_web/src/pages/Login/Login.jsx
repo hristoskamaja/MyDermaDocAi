@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
 import { jwtAPI } from '../../services/api';
@@ -20,20 +20,20 @@ export default function Login() {
         if (!email || !password) { setError(t('login.errorEmpty')); return; }
         setLoading(true);
         try {
-            // POST /api/jwt-auth/login/ → враќа access + refresh
+            // POST /api/jwt-auth/login/ → returns access + refresh
             const res = await jwtAPI.login({ email, password });
             const { access, refresh } = res.data;
 
-            // Зачувај токени
+            // Store tokens
             localStorage.setItem('ss_token',   access);
             localStorage.setItem('ss_refresh', refresh);
 
-            // Земи податоци за најавениот user
-            // Треба да го setнеме токенот пред да повикаме me()
+            // Fetch the logged-in user's data
+            // The token must be set before we call me()
             const meRes = await jwtAPI.me();
             login(access, meRes.data);
 
-            navigate('/dashboard');
+            navigate(meRes.data.role === 'ADMIN' ? '/dashboard' : '/scan');
         } catch (err) {
             console.error('Login error:', err);
             setError(
@@ -98,6 +98,9 @@ export default function Login() {
                             {loading ? t('login.signingIn') : t('login.signInBtn')}
                         </button>
                         <button type="button" className="login-forgot">{t('login.forgotPassword')}</button>
+                        <div className="login-register-prompt">
+                            {t('login.noAccount')} <Link to="/register" className="login-register-link">{t('login.signUpLink')}</Link>
+                        </div>
                     </form>
                 </div>
             </div>
