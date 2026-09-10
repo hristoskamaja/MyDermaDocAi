@@ -6,8 +6,8 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import SkinCondition, Recommendation, ConditionRecommendation
-from .serializers import SkinConditionSerializer, RecommendationSerializer
+from .models import SkinCondition, Recommendation, ConditionRecommendation, Dermatologist
+from .serializers import SkinConditionSerializer, RecommendationSerializer, DermatologistSerializer
 
 
 def is_admin_user(request):
@@ -26,8 +26,8 @@ def admin_required_response():
 
 
 # SKIN CONDITIONS
-# Еквивалент на Diseases страницата во leafscan_web/src/pages/Diseases -
-# React admin панелот тука листа/уредува состојби наместо болести на растенија.
+# Equivalent to the Diseases page in leafscan_web/src/pages/Diseases -
+# the React admin panel here lists/edits conditions instead of plant diseases.
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
@@ -250,5 +250,90 @@ def recommendation_detail(request, id):
         recommendation.delete()
         return Response(
             {"message": "Recommendation deleted successfully."},
+            status=status.HTTP_200_OK
+        )
+
+
+# DERMATOLOGISTS
+# Manually maintained list (not loaded automatically) - any logged-in user
+# (mobile/patient-web) may read it, but only an admin may add/edit/delete
+# records. Regular users only see is_active=True records; the admin sees
+# everything (including inactive ones) so they can edit them.
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def dermatologists_collection(request):
+    if request.method == "GET":
+        if is_admin_user(request):
+            dermatologists = Dermatologist.objects.all()
+        else:
+            dermatologists = Dermatologist.objects.filter(is_active=True)
+
+        search = request.query_params.get("search")
+        city = request.query_params.get("city")
+
+        if search:
+            dermatologists = dermatologists.filter(name__icontains=search)
+
+        if city:
+            dermatologists = dermatologists.filter(city__icontains=city)
+
+        serializer = DermatologistSerializer(dermatologists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    if request.method == "POST":
+        if not is_admin_user(request):
+            return admin_required_response()
+
+        serializer = DermatologistSerializer(data=request.data)
+
+        if serializer.is_valid():
+            dermatologist = serializer.save()
+            return Response(
+                {
+                    "message": "Dermatologist created successfully.",
+                    "dermatologist": DermatologistSerializer(dermatologist).data,
+                },
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+@permission_classes([IsAuthenticated])
+def dermatologist_detail(request, id):
+    dermatologist = get_object_or_404(Dermatologist, id=id)
+
+    if request.method == "GET":
+        if not dermatologist.is_active and not is_admin_user(request):
+            return admin_required_response()
+
+        serializer = DermatologistSerializer(dermatologist)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    if not is_admin_user(request):
+        return admin_required_response()
+
+    if request.method in ("PUT", "PATCH"):
+        partial = request.method == "PATCH"
+        serializer = DermatologistSerializer(dermatologist, data=request.data, partial=partial)
+
+        if serializer.is_valid():
+            dermatologist = serializer.save()
+            return Response(
+                {
+                    "message": "Dermatologist updated successfully.",
+                    "dermatologist": DermatologistSerializer(dermatologist).data,
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "DELETE":
+        dermatologist.delete()
+        return Response(
+            {"message": "Dermatologist deleted successfully."},
             status=status.HTTP_200_OK
         )

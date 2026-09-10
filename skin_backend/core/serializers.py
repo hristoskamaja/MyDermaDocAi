@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import SkinCondition, Recommendation
+from .models import SkinCondition, Recommendation, Dermatologist
 
 
 class SkinConditionSerializer(serializers.ModelSerializer):
@@ -12,6 +12,7 @@ class SkinConditionSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "symptoms",
+            "treatment_overview",
             "image",
             "image_description",
             "severity",
@@ -27,4 +28,21 @@ class RecommendationSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "type",
+        ]
+
+
+class DermatologistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dermatologist
+        fields = [
+            "id",
+            "name",
+            "clinic_name",
+            "city",
+            "address",
+            "phone",
+            "website",
+            "notes",
+            "is_active",
+            "created_at",
         ]

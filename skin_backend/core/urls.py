@@ -13,4 +13,8 @@ urlpatterns = [
     # Recommendations
     path("recommendations/", views.recommendations_collection, name="recommendations_collection"),
     path("recommendations/<int:id>/", views.recommendation_detail, name="recommendation_detail"),
+
+    # Dermatologists
+    path("dermatologists/", views.dermatologists_collection, name="dermatologists_collection"),
+    path("dermatologists/<int:id>/", views.dermatologist_detail, name="dermatologist_detail"),
 ]
