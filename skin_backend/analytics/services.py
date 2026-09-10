@@ -1,12 +1,12 @@
 """
-Прилагодено од leafscan/analytics/services.py.
+Adapted from leafscan/analytics/services.py.
 
-Разлики од оригиналот:
-- Analysis.condition наместо Analysis.plant/Analysis.disease
-- Нема HEALTHY/INFECTED резултат (секоја анализа секогаш препознава некоја
-  состојба од lesion-датасетите) - наместо "healthy count" следиме
-  low_confidence_rate (колку анализи имале несигурно предвидување)
-- "diseases_by_category" -> "conditions_by_category", користи
+Differences from the original:
+- Analysis.condition instead of Analysis.plant/Analysis.disease
+- No HEALTHY/INFECTED result (every analysis always recognizes some
+  condition from the lesion datasets) - instead of "healthy count" we
+  track low_confidence_rate (how many analyses had an uncertain prediction)
+- "diseases_by_category" -> "conditions_by_category", uses
   SkinCondition.category (BENIGN/PRECANCEROUS/MALIGNANT/INFLAMMATORY/OTHER)
 """
 

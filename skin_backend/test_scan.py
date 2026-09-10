@@ -1,14 +1,14 @@
 """
-Брз тест на /api/analyses/scan-skin/ со реалниот истрениран модел.
+Quick test of /api/analyses/scan-skin/ against the real trained model.
 
-Користење:
-    python test_scan.py <email> <password> <патека_до_слика.jpg>
+Usage:
+    python test_scan.py <email> <password> <path_to_image.jpg>
 
-Пример:
+Example:
     python test_scan.py admin@skinscan.ai mojaLozinka123 "C:\\Users\\Maja\\Downloads\\zr7vgbcyr2-1\\images\\imgs_part_1\\PAT_8_15_820.png"
 
-Ако немаш при рака патека до слика, најди било која .jpg/.png слика на кожа
-(на пр. од распакуваната PAD-UFES-20 папка во Downloads) и залепи ја патеката.
+If you don't have an image path handy, find any .jpg/.png skin image
+(e.g. from the unpacked PAD-UFES-20 folder in Downloads) and paste its path.
 """
 import sys
 import requests

@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# Идентично со leafscan/accounts/models.py - логиката за корисници не зависи
-# од доменот (растенија vs кожа).
+# Identical to leafscan/accounts/models.py - the user logic doesn't depend
+# on the domain (plants vs skin).
 
 
 class UserRole(models.TextChoices):

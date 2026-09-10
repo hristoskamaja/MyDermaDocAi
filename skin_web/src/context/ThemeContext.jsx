@@ -1,18 +1,18 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ThemeContext — глобален dark/light mode
-// Топла cosmetics/beauty палета (крем/беж + бордо акценти)
+// ThemeContext — global dark/light mode
+// Warm cosmetics/beauty palette (cream/beige + burgundy accents)
 //
-// Light mode бои:
+// Light mode colors:
 //   background: #F3E7DA
 //   cardBg:     #FFFFFF
 //   textDark:   #2B1810
 //   textMuted:  #8C7568
 //   border:     #E5D5C5
-//   brand:      #8B2E42 (бордо)
+//   brand:      #8B2E42 (burgundy)
 //
-// Dark mode бои:
+// Dark mode colors:
 //   background: #1C1310
 //   cardBg:     #2A1E1A
 //   textDark:   #F3E7DA

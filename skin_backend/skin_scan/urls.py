@@ -1,12 +1,12 @@
 """
-Проектско ниво на urls.py - исто како leafscan/leafscan/urls.py.
+Project-level urls.py - same as leafscan/leafscan/urls.py.
 
-/api/auth/        -> accounts.urls      (token-based login/register, го користи React admin)
-/api/jwt-auth/     -> jwt_auth.urls     (JWT access/refresh, го користи Flutter апп-от)
-/api/users/        -> accounts.user_urls (admin управување со корисници)
-/api/              -> core.urls        (SkinCondition/Recommendation CRUD за admin панел)
-/api/analyses/     -> analyses.urls    (scan-skin + историја на анализи)
-/api/              -> analytics.urls   (dashboard/statistics за React admin панел)
+/api/auth/        -> accounts.urls      (token-based login/register, used by React admin)
+/api/jwt-auth/     -> jwt_auth.urls     (JWT access/refresh, used by the Flutter app)
+/api/users/        -> accounts.user_urls (admin user management)
+/api/              -> core.urls        (SkinCondition/Recommendation CRUD for the admin panel)
+/api/analyses/     -> analyses.urls    (scan-skin + analysis history)
+/api/              -> analytics.urls   (dashboard/statistics for the React admin panel)
 """
 
 from django.contrib import admin

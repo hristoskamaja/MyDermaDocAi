@@ -232,8 +232,8 @@ def user_detail_update_delete(request, id):
 @permission_classes([IsAdminUser])
 def get_user_analyses(request, id):
     """
-    Прилагодено од leafscan: analysis.plant/analysis.disease -> analysis.condition
-    (кожната верзија нема посебен "растение" концепт, само една состојба).
+    Adapted from leafscan: analysis.plant/analysis.disease -> analysis.condition
+    (the skin version has no separate "plant" concept, just one condition).
     """
 
     user = get_object_or_404(User, id=id)

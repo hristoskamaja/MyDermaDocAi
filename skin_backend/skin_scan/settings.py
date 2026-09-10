@@ -1,12 +1,12 @@
 """
 Django settings for skin_scan project.
 
-Иста структура како leafscan/leafscan/settings.py, со две намерни разлики:
+Same structure as leafscan/leafscan/settings.py, with two deliberate differences:
 
-1. Базата по default е SQLite (нула инсталација - работи веднаш во PyCharm).
-   Ако сакаш PostgreSQL (како во leafscan), постави DB_ENGINE=postgres во .env
-   - гледај ја секцијата DATABASES подолу.
-2. Има и "analytics" app (dashboard/statistics за React admin панел).
+1. The database defaults to SQLite (zero setup - works immediately in PyCharm).
+   If you want PostgreSQL (like in leafscan), set DB_ENGINE=postgres in .env
+   - see the DATABASES section below.
+2. There's also an "analytics" app (dashboard/statistics for the React admin panel).
 """
 
 import os
@@ -86,8 +86,8 @@ WSGI_APPLICATION = "skin_scan.wsgi.application"
 
 
 # --- Database ---
-# По default: SQLite (skin_scan/db.sqlite3), нула поставки потребни.
-# За PostgreSQL: постави во .env -> DB_ENGINE=postgres, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+# By default: SQLite (skin_scan/db.sqlite3), zero setup required.
+# For PostgreSQL: set in .env -> DB_ENGINE=postgres, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 if os.getenv("DB_ENGINE", "sqlite") == "postgres":
     DATABASES = {
@@ -167,16 +167,16 @@ SIMPLE_JWT = {
 
 
 # --- CORS ---
-# Дозволува React (localhost:3000) и Flutter dev да комуницираат со бекендот.
+# Allows React (localhost:3000) and Flutter dev to talk to the backend.
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # само во DEBUG, никогаш во продукција
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # only in DEBUG, never in production
 
 
 # --- Gemini ---
-# Се чита директно во analyses/services/gemini_service.py преку os.getenv("GEMINI_API_KEY")
-# Не заборавај да го додадеш GEMINI_API_KEY во .env (гледај .env.example)
+# Read directly in analyses/services/gemini_service.py via os.getenv("GEMINI_API_KEY")
+# Don't forget to add GEMINI_API_KEY to .env (see .env.example)

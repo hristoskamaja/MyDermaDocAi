@@ -1,3 +1,3 @@
 from django.contrib import admin
 
-# Нема сопствени модели за регистрирање.
+# No own models to register.

@@ -1,26 +1,26 @@
 """
 skin_model_service.py
 
-Инференца сервис за класификација на кожни лезии.
+Inference service for skin lesion classification.
 
->>> МЕСТО КАДЕ ВЛЕГУВА ТВОЈОТ НАТРЕНИРАН МОДЕЛ <<<
+>>> WHERE YOUR TRAINED MODEL GOES <<<
 
-Откако ќе го извршиш skin_disease_training.ipynb во Google Colab и ќе ги
-симнеш `skin_model.pt` и `label_converter.json`, стави ги вака:
+After you run skin_disease_training.ipynb in Google Colab and download
+`skin_model.pt` and `label_converter.json`, place them like this:
 
     analyses/
         services/
             ai_model/
-                skin_model.pt          <-- ТУКА (моделот, ~40-50MB)
-            label_converter.json       <-- ТУКА (едно ниво погоре, покрај овој фајл)
-            skin_model_service.py      <-- (овој фајл, веќе постои)
+                skin_model.pt          <-- HERE (the model, ~40-50MB)
+            label_converter.json       <-- HERE (one level up, next to this file)
+            skin_model_service.py      <-- (this file, already exists)
             gemini_service.py
 
-Додека тие два фајла ги нема, predict_skin_condition() ќе фрли
-SkinModelPredictionError со јасна порака - тоа е нормално и очекувано пред
-да го натренираш моделот. Останатиот дел од бекендот (views, urls, admin)
-може да се тестира и без моделот - само /scan-skin/ endpoint-от ќе враќа
-грешка додека не го додадеш .pt фајлот.
+While those two files don't exist yet, predict_skin_condition() will raise
+a SkinModelPredictionError with a clear message - that's normal and
+expected before you train the model. The rest of the backend (views, urls,
+admin) can be tested without the model - only the /scan-skin/ endpoint
+will return an error until you add the .pt file.
 """
 
 import json
@@ -37,10 +37,10 @@ MODEL_DIR = Path(__file__).resolve().parent / "ai_model"
 MODEL_PATH = MODEL_DIR / "skin_model.pt"
 LABEL_CONVERTER_PATH = Path(__file__).resolve().parent / "label_converter.json"
 
-IMAGE_SIZE = 244  # мора да се совпаѓа со трансформациите користени при тренирање
+IMAGE_SIZE = 244  # must match the transforms used during training
 
-# Ако largest-probability предвидувањето е под овој праг, го означуваме
-# резултатот како несигурен наместо да тврдиме конкретна дијагноза.
+# If the largest-probability prediction is below this threshold, we mark
+# the result as uncertain instead of claiming a definitive diagnosis.
 LOW_CONFIDENCE_THRESHOLD = 0.45
 
 _cached_model: Optional[nn.Module] = None
@@ -75,7 +75,7 @@ def _load_label_converter() -> Mapping[str, dict]:
 
 
 def _build_model(num_classes: int) -> nn.Module:
-    # weights=None бидејќи ги вчитуваме сопствените тежини од .pt подолу.
+    # weights=None because we load our own weights from .pt below.
     model = models.efficientnet_b3(weights=None)
     in_features = model.classifier[1].in_features
     model.classifier[1] = nn.Linear(in_features, num_classes)
@@ -135,19 +135,20 @@ def _build_transform() -> transforms.Compose:
 
 def predict_skin_condition(image_file) -> dict:
     """
-    Прима слика (file path или file-like object од request.FILES) и враќа:
+    Takes an image (file path or file-like object from request.FILES) and
+    returns:
 
     {
-        "condition_key": "melanoma",        # мора да се совпаѓа со SkinCondition.key
-        "condition_name": "Melanoma",       # читливо име за прикажување
-        "severity": "HIGH",                 # LOW / MEDIUM / HIGH, од label_converter.json
+        "condition_key": "melanoma",        # must match SkinCondition.key
+        "condition_name": "Melanoma",       # human-readable display name
+        "severity": "HIGH",                 # LOW / MEDIUM / HIGH, from label_converter.json
         "confidence": 0.87,                 # 0-1
-        "is_low_confidence": False,         # True ако е под LOW_CONFIDENCE_THRESHOLD
+        "is_low_confidence": False,         # True if below LOW_CONFIDENCE_THRESHOLD
     }
 
-    Не враќа HEALTHY/AFFECTED бидејќи двата тренинг датасети (HAM10000,
-    PAD-UFES-20) содржат само слики на лезии - моделот секогаш класифицира
-    ВО еден од типовите лезии.
+    Does not return HEALTHY/AFFECTED because both training datasets
+    (HAM10000, PAD-UFES-20) only contain images of lesions - the model
+    always classifies INTO one of the lesion types.
     """
 
     try:
