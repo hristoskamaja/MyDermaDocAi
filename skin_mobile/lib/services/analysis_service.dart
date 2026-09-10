@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../models/analysis.dart';
+import '../models/chat_message.dart';
 import 'api_client.dart';
 
 /// Handles skin scan upload + analysis history retrieval against the
@@ -29,5 +30,24 @@ class AnalysisService {
   Future<AnalysisDetail> getAnalysisById(int id) async {
     final data = await ApiClient.get('/analyses/$id/');
     return AnalysisDetail.fromJson(data as Map<String, dynamic>);
+  }
+
+  /// Fetches the Q&A history for a given analysis.
+  Future<List<ChatMessage>> getChatHistory(int analysisId) async {
+    final data = await ApiClient.get('/analyses/$analysisId/chat/');
+    return (data as List)
+        .map((e) => ChatMessage.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Asks a follow-up question about the detected condition on this
+  /// analysis. Returns both the saved user message and the generated
+  /// assistant answer.
+  Future<ChatExchange> askQuestion(int analysisId, String question) async {
+    final data = await ApiClient.post(
+      '/analyses/$analysisId/chat/',
+      {'question': question},
+    );
+    return ChatExchange.fromJson(data as Map<String, dynamic>);
   }
 }
