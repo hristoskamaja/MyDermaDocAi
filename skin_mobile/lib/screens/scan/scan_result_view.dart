@@ -13,10 +13,13 @@ class ScanResultView extends StatelessWidget {
   final String severity;
   final double confidence;
   final String? description;
+  final String? symptoms;
+  final String? treatmentOverview;
   final List<Recommendation> recommendations;
   final bool isLowConfidence;
   final String? primaryActionLabel;
   final VoidCallback? onPrimaryAction;
+  final Widget? trailing;
 
   const ScanResultView({
     super.key,
@@ -25,10 +28,13 @@ class ScanResultView extends StatelessWidget {
     required this.severity,
     required this.confidence,
     this.description,
+    this.symptoms,
+    this.treatmentOverview,
     this.recommendations = const [],
     this.isLowConfidence = false,
     this.primaryActionLabel,
     this.onPrimaryAction,
+    this.trailing,
   });
 
   @override
@@ -109,6 +115,10 @@ class ScanResultView extends StatelessWidget {
               style: TextStyle(color: c.textMuted, fontSize: 14, height: 1.5),
             ),
           ],
+          if (symptoms != null && symptoms!.trim().isNotEmpty)
+            _infoSection(c, 'SYMPTOMS', symptoms!),
+          if (treatmentOverview != null && treatmentOverview!.trim().isNotEmpty)
+            _infoSection(c, 'TREATMENT OVERVIEW', treatmentOverview!),
           if (recommendations.isNotEmpty) ...[
             const SizedBox(height: 26),
             if (medical.isNotEmpty)
@@ -152,6 +162,37 @@ class ScanResultView extends StatelessWidget {
               ),
             ),
           ],
+          if (trailing != null) ...[
+            const SizedBox(height: 28),
+            Divider(color: c.border),
+            const SizedBox(height: 20),
+            trailing!,
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _infoSection(AppColors c, String title, String body) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: c.textMuted,
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            body,
+            style: TextStyle(color: c.textMuted, fontSize: 14, height: 1.5),
+          ),
         ],
       ),
     );

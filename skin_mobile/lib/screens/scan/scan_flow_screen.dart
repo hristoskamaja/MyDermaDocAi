@@ -9,6 +9,8 @@ import '../../services/analysis_service.dart';
 import '../../services/api_client.dart';
 import '../../services/condition_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/analysis_chat_section.dart';
+import '../dermatologist_list_screen.dart';
 import 'scan_result_view.dart';
 import 'scan_uncertain_view.dart';
 
@@ -140,9 +142,12 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
           severity: analysis.condition.severity,
           confidence: analysis.confidence,
           description: analysis.condition.description,
+          symptoms: analysis.condition.symptoms,
+          treatmentOverview: analysis.condition.treatmentOverview,
           recommendations: _recommendations,
           primaryActionLabel: 'Scan again',
           onPrimaryAction: _reset,
+          trailing: AnalysisChatSection(analysisId: analysis.id),
         );
       case _ScanStage.uncertain:
         final prediction = _scanResponse!.prediction;
@@ -152,13 +157,8 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
           confidence: prediction.confidence,
           onRescan: _reset,
           onFindDermatologist: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Dermatologist finder is coming soon. Please consult your '
-                  'local healthcare provider for now.',
-                ),
-              ),
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const DermatologistListScreen()),
             );
           },
         );

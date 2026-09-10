@@ -1,12 +1,13 @@
 /// Represents a skin condition, as nested in the analysis detail /
-/// scan-skin responses: `{id, key, name, description, symptoms, severity,
-/// category, image}`.
+/// scan-skin responses: `{id, key, name, description, symptoms,
+/// treatment_overview, severity, category, image}`.
 class Condition {
   final int id;
   final String key;
   final String name;
   final String? description;
   final String? symptoms;
+  final String? treatmentOverview;
   final String severity;
   final String category;
   final String? image;
@@ -17,6 +18,7 @@ class Condition {
     required this.name,
     this.description,
     this.symptoms,
+    this.treatmentOverview,
     required this.severity,
     required this.category,
     this.image,
@@ -29,6 +31,7 @@ class Condition {
       name: json['name'] as String? ?? '',
       description: json['description'] as String?,
       symptoms: json['symptoms'] as String?,
+      treatmentOverview: json['treatment_overview'] as String?,
       severity: json['severity'] as String? ?? 'LOW',
       category: json['category'] as String? ?? 'OTHER',
       image: json['image'] as String?,

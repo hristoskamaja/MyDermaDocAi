@@ -7,6 +7,7 @@ import '../services/api_client.dart';
 import '../services/api_config.dart';
 import '../services/condition_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/analysis_chat_section.dart';
 import 'scan/scan_result_view.dart';
 
 /// Detail view for a past scan, opened from History. Reuses the same
@@ -91,8 +92,11 @@ class _AnalysisDetailScreenState extends State<AnalysisDetailScreen> {
             severity: detail.condition.severity,
             confidence: detail.confidence,
             description: detail.condition.description,
+            symptoms: detail.condition.symptoms,
+            treatmentOverview: detail.condition.treatmentOverview,
             recommendations: data.recommendations,
             isLowConfidence: detail.isLowConfidence,
+            trailing: AnalysisChatSection(analysisId: detail.id),
           );
         },
       ),
