@@ -7,10 +7,18 @@ const api = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
-// Attaches the JWT token to every request
+// Attaches the JWT token, and the current UI language (see
+// LanguageContext.jsx, same localStorage key), to every request - so
+// AI-generated/admin-entered text (condition description/symptoms/
+// treatment_overview, recommendations) comes back in whichever language
+// the user has selected instead of always defaulting to Macedonian.
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('ss_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
+
+    const lang = localStorage.getItem('skinscan-lang') || 'en';
+    config.params = { ...config.params, lang };
+
     return config;
 });
 
