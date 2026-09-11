@@ -88,14 +88,16 @@ class SkinCondition(models.Model):
 
 class Dermatologist(models.Model):
     """
-    Manually maintained list of dermatologists - NOT loaded/scraped
-    automatically from external sources (that's a deliberate decision:
-    scraping real doctor/appointment data is fragile and a legal/ToS risk).
-    The admin (a non-technical user) manually enters the real dermatologists
-    she knows about through the React admin panel, same as SkinCondition
-    above. The table can legitimately be empty until the admin adds
-    records - that's not a bug, the UI must clearly show that instead of
-    displaying fabricated/fake contact info.
+    Directory of dermatologists shown to patients. Rows can come from two
+    places: the admin typing one in by hand through the React admin panel,
+    or core/management/commands/scrape_dermatologists.py (a one-off, admin-
+    run command that pulls public listings from zk.mk, the Macedonian
+    business directory - this is a student project, so we deliberately
+    didn't build anything more elaborate than that around legal/ToS
+    concerns). Either way, the admin can edit or deactivate any row
+    afterwards. The table can legitimately be empty until populated -
+    that's not a bug, the UI must clearly show that instead of displaying
+    fabricated/fake contact info.
     """
 
     name = models.CharField(max_length=150)
@@ -105,6 +107,16 @@ class Dermatologist(models.Model):
     phone = models.CharField(max_length=50, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+
+    # Used to sort "find a dermatologist" results by proximity - real GPS
+    # coords on mobile, or the chosen city's center coords on web (see
+    # core/views.py -> _resolve_origin / _haversine_km). Filled in
+    # automatically by the scraper (from the Google Maps link on zk.mk),
+    # or left blank for hand-entered rows (they just won't be distance-
+    # sorted - they still show up, sorted alphabetically at the end).
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
