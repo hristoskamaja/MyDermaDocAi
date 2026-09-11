@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import SkinCondition, Recommendation, Dermatologist
+from .services.geo import haversine_km
 
 
 class SkinConditionSerializer(serializers.ModelSerializer):
@@ -86,6 +87,18 @@ class LocalizedRecommendationSerializer(serializers.ModelSerializer):
 
 
 class DermatologistSerializer(serializers.ModelSerializer):
+    """
+    latitude/longitude are plain writable fields (filled in automatically
+    by the scraper, but the admin can hand-edit/add them too, same
+    override pattern as SkinCondition's _en fields).
+
+    distance_km is read-only and only non-null when the request supplied
+    an origin point to sort by - see core/views.py's dermatologists_
+    collection -> _resolve_origin. context["origin"] is (lat, lng) or
+    None; it's set there, not by this serializer.
+    """
+    distance_km = serializers.SerializerMethodField()
+
     class Meta:
         model = Dermatologist
         fields = [
@@ -97,6 +110,16 @@ class DermatologistSerializer(serializers.ModelSerializer):
             "phone",
             "website",
             "notes",
+            "latitude",
+            "longitude",
+            "distance_km",
             "is_active",
             "created_at",
         ]
+
+    def get_distance_km(self, obj):
+        origin = self.context.get("origin")
+        if not origin or obj.latitude is None or obj.longitude is None:
+            return None
+        lat, lng = origin
+        return round(haversine_km(lat, lng, obj.latitude, obj.longitude), 1)

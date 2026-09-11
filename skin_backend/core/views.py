@@ -16,6 +16,7 @@ from .serializers import (
     LocalizedRecommendationSerializer,
     DermatologistSerializer,
 )
+from .services.geo import city_center, haversine_km
 from .services.translation import fill_missing_translations
 
 # The three fields that get an auto-generated English counterpart - see
@@ -357,10 +358,43 @@ def recommendation_detail(request, id):
 
 
 # DERMATOLOGISTS
-# Manually maintained list (not loaded automatically) - any logged-in user
-# (mobile/patient-web) may read it, but only an admin may add/edit/delete
-# records. Regular users only see is_active=True records; the admin sees
-# everything (including inactive ones) so they can edit them.
+# List can come from the admin typing rows in by hand, or from
+# scrape_dermatologists.py (see core/management/commands/) - any logged-in
+# user (mobile/patient-web) may read it, but only an admin may add/edit/
+# delete records. Regular users only see is_active=True records; the admin
+# sees everything (including inactive ones) so they can edit them.
+
+def _resolve_origin(request):
+    """
+    Figures out the (lat, lng) point to sort "find a dermatologist"
+    results by, from whichever the client sent:
+    - ?lat=&lng= - real GPS coords (mobile; browser geolocation needs
+      HTTPS, which this student project's web app doesn't have yet).
+    - ?near_city= - the user's chosen city, resolved to that city's center
+      via MK_CITY_COORDS (the web fallback - no permission prompt needed).
+
+    Deliberately a DIFFERENT query param than the existing plain ?city=
+    filter below (which narrows the list down to just that city) - mixing
+    the two up would mean "sort near Skopje" also silently HID every
+    dermatologist outside Skopje, which isn't what "find a dermatologist
+    near me" should do (you still want to see everyone, nearest first).
+
+    Returns None if neither was given or ?near_city= isn't one we know.
+    """
+    lat = request.query_params.get("lat")
+    lng = request.query_params.get("lng")
+    if lat and lng:
+        try:
+            return (float(lat), float(lng))
+        except ValueError:
+            pass
+
+    near_city = request.query_params.get("near_city")
+    if near_city:
+        return city_center(near_city)
+
+    return None
+
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
@@ -380,7 +414,25 @@ def dermatologists_collection(request):
         if city:
             dermatologists = dermatologists.filter(city__icontains=city)
 
-        serializer = DermatologistSerializer(dermatologists, many=True)
+        dermatologists = list(dermatologists)
+
+        origin = _resolve_origin(request)
+        if origin:
+            lat, lng = origin
+            # Entries with no coordinates (hand-entered by the admin,
+            # never scraped) sort after every distance-ranked one instead
+            # of crashing or clumping at the top.
+            dermatologists.sort(
+                key=lambda d: (
+                    haversine_km(lat, lng, d.latitude, d.longitude)
+                    if d.latitude is not None and d.longitude is not None
+                    else float("inf")
+                )
+            )
+
+        serializer = DermatologistSerializer(
+            dermatologists, many=True, context={"origin": origin}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     if request.method == "POST":
