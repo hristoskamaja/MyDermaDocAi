@@ -42,8 +42,18 @@ class SkinCondition(models.Model):
 
     key = models.SlugField(max_length=50, unique=True)
     name = models.CharField(max_length=100, unique=True)
+
+    # The admin normally only types the Macedonian text (below), and the
+    # matching _en field is filled in automatically by
+    # core/services/translation.py (a Gemini call) whenever description/
+    # symptoms/treatment_overview is created or changed - see
+    # core/views.py. The admin can also hand-edit/correct the _en text
+    # directly in the admin panel; views.py protects a manually-typed _en
+    # value from being auto-overwritten in the same request.
     description = models.TextField(blank=True, null=True)
+    description_en = models.TextField(blank=True, null=True)
     symptoms = models.TextField(blank=True, null=True)
+    symptoms_en = models.TextField(blank=True, null=True)
 
     # DELIBERATELY "treatment_overview", not "treatment" / "prescription":
     # this is a general, educational description of what dermatologists
@@ -52,6 +62,7 @@ class SkinCondition(models.Model):
     # together with a reminder that a doctor, not the app, makes the final
     # treatment decision.
     treatment_overview = models.TextField(blank=True, null=True)
+    treatment_overview_en = models.TextField(blank=True, null=True)
 
     image = models.ImageField(upload_to="conditions/", blank=True, null=True)
     image_description = models.TextField(blank=True, null=True)
@@ -112,8 +123,16 @@ class Recommendation(models.Model):
     general care advice and a recommendation to see a doctor.
     """
 
+    # Unlike SkinCondition (where the admin-entered text is Macedonian and
+    # English gets auto-translated), Gemini's recommendation prompt has
+    # always been written in English - so `name`/`description` ARE English
+    # (unchanged, so existing rows stay valid), and name_mk/description_mk
+    # are the Macedonian counterpart, now generated in the same Gemini call
+    # (see analyses/services/gemini_service.py -> generate_recommendations_with_gemini).
     name = models.CharField(max_length=150)
+    name_mk = models.CharField(max_length=150, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    description_mk = models.TextField(blank=True, null=True)
     type = models.CharField(
         max_length=20,
         choices=RecommendationType.choices,
