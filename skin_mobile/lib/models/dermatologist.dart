@@ -1,7 +1,7 @@
-/// Represents a single entry in the manually-curated dermatologist
-/// directory (`GET /dermatologists/`). This list is typed in by hand by an
-/// admin through the React admin panel - it is never scraped or
-/// auto-populated, so most fields beyond `name` are optional.
+/// Represents a single entry in the dermatologist directory
+/// (`GET /dermatologists/`). Rows can come from the admin typing them in
+/// by hand through the React admin panel, or from scrape_dermatologists.py
+/// on the backend - either way most fields beyond `name` are optional.
 class Dermatologist {
   final int id;
   final String name;
@@ -12,6 +12,11 @@ class Dermatologist {
   final String? website;
   final String? notes;
 
+  /// Only present when the request included ?lat=&lng= (see
+  /// DermatologistService.getAll) - how far this entry is from that point,
+  /// in kilometers. Null otherwise (never guess/compute it client-side).
+  final double? distanceKm;
+
   Dermatologist({
     required this.id,
     required this.name,
@@ -21,6 +26,7 @@ class Dermatologist {
     this.phone,
     this.website,
     this.notes,
+    this.distanceKm,
   });
 
   factory Dermatologist.fromJson(Map<String, dynamic> json) {
@@ -33,6 +39,7 @@ class Dermatologist {
       phone: json['phone'] as String?,
       website: json['website'] as String?,
       notes: json['notes'] as String?,
+      distanceKm: (json['distance_km'] as num?)?.toDouble(),
     );
   }
 }
