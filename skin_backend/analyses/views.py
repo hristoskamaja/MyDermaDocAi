@@ -62,6 +62,8 @@ def save_gemini_recommendations_for_condition(condition, recommendations_data):
         name = item.get("name")
         description = item.get("description")
         rec_type = item.get("type")
+        name_mk = item.get("name_mk")
+        description_mk = item.get("description_mk")
 
         if not name or not description or not rec_type:
             continue
@@ -69,12 +71,26 @@ def save_gemini_recommendations_for_condition(condition, recommendations_data):
         recommendation, created = Recommendation.objects.get_or_create(
             name=name,
             type=rec_type,
-            defaults={"description": description},
+            defaults={
+                "description": description,
+                "name_mk": name_mk,
+                "description_mk": description_mk,
+            },
         )
 
-        if not created and not recommendation.description:
-            recommendation.description = description
-            recommendation.save(update_fields=["description"])
+        if not created:
+            update_fields = []
+            if not recommendation.description:
+                recommendation.description = description
+                update_fields.append("description")
+            if not recommendation.name_mk and name_mk:
+                recommendation.name_mk = name_mk
+                update_fields.append("name_mk")
+            if not recommendation.description_mk and description_mk:
+                recommendation.description_mk = description_mk
+                update_fields.append("description_mk")
+            if update_fields:
+                recommendation.save(update_fields=update_fields)
 
         ConditionRecommendation.objects.get_or_create(
             condition=condition,
@@ -188,7 +204,7 @@ def scan_skin(request):
 
     recommendation_generation = generate_recommendations_only_if_missing(condition)
 
-    serializer = AnalysisDetailSerializer(analysis)
+    serializer = AnalysisDetailSerializer(analysis, context={"request": request})
 
     return Response(
         {
@@ -226,7 +242,7 @@ def analysis_detail(request, id):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    serializer = AnalysisDetailSerializer(analysis)
+    serializer = AnalysisDetailSerializer(analysis, context={"request": request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

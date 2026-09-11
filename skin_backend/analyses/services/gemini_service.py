@@ -37,6 +37,30 @@ _RETRYABLE_STATUS_CODES = {429, 503}
 _MAX_ATTEMPTS = 3
 _RETRY_BACKOFF_SECONDS = 1.5
 
+# Without an explicit timeout, the underlying HTTP client has NO default
+# ceiling - if Google's API is slow/unreachable from the server's network,
+# a single call can hang for minutes, which hangs the whole scan-skin /
+# chat request (and eventually the mobile/web client's own timeout fires
+# first, showing "TimeoutException..." with no useful fallback content).
+# 15s per attempt keeps the worst case (3 attempts + backoff, only on
+# retryable 429/503 errors) under the mobile app's 60s scan-skin timeout.
+#
+# Built defensively at import time: if the installed google-genai version
+# doesn't recognize this field, we fall back to no explicit timeout
+# instead of crashing the import (which would break every view in this
+# app, since views.py imports from this module at startup).
+_GEMINI_TIMEOUT_MS = 15_000
+try:
+    _HTTP_OPTIONS = types.HttpOptions(timeout=_GEMINI_TIMEOUT_MS)
+except Exception:
+    _HTTP_OPTIONS = None
+
+
+def _make_client(api_key: str):
+    if _HTTP_OPTIONS is not None:
+        return genai.Client(api_key=api_key, http_options=_HTTP_OPTIONS)
+    return genai.Client(api_key=api_key)
+
 
 def _generate_content_with_retry(client, prompt, config):
     """
@@ -95,10 +119,16 @@ Rules:
   - SELF_CARE
   - MEDICAL_CONSULT
   - LIFESTYLE
+- The app is bilingual (English/Macedonian), so provide EVERY recommendation
+  in BOTH languages: "name"/"description" in English, and "name_mk"/
+  "description_mk" as a natural (not literal word-for-word) Macedonian
+  translation with the same meaning and tone.
 
 Each recommendation must have:
 - name
+- name_mk
 - description
+- description_mk
 - type
 
 The response must be a JSON array in this format:
@@ -106,7 +136,9 @@ The response must be a JSON array in this format:
 [
   {{
     "name": "See a dermatologist",
+    "name_mk": "Посети дерматолог",
     "description": "Schedule an appointment with a dermatologist for a proper clinical evaluation and, if needed, a biopsy.",
+    "description_mk": "Закажи преглед кај дерматолог за соодветна клиничка проценка и, ако е потребно, биопсија.",
     "type": "MEDICAL_CONSULT"
   }}
 ]
@@ -141,9 +173,17 @@ def validate_recommendations(recommendations: List[Dict]) -> List[Dict]:
         if type_counter[rec_type] >= 2:
             continue
 
+        # name_mk/description_mk are best-effort - if Gemini omitted them,
+        # fall back to the English text rather than dropping the whole
+        # recommendation (an English-only card beats no card at all).
+        name_mk = item.get("name_mk") or name
+        description_mk = item.get("description_mk") or description
+
         valid_recommendations.append({
             "name": str(name).strip(),
+            "name_mk": str(name_mk).strip(),
             "description": str(description).strip(),
+            "description_mk": str(description_mk).strip(),
             "type": rec_type,
         })
 
@@ -163,9 +203,14 @@ def validate_recommendations(recommendations: List[Dict]) -> List[Dict]:
 def get_mandatory_medical_consult() -> Dict:
     return {
         "name": "Consult a dermatologist",
+        "name_mk": "Посети дерматолог",
         "description": (
             "This result is an AI-generated estimate, not a medical diagnosis. "
             "Please consult a licensed dermatologist for accurate evaluation."
+        ),
+        "description_mk": (
+            "Овој резултат е AI-генерирана процена, а не медицинска дијагноза. "
+            "Посети лиценциран дерматолог за точна проценка."
         ),
         "type": "MEDICAL_CONSULT",
     }
@@ -176,9 +221,14 @@ def get_fallback_recommendations(condition_name: str, severity: str) -> List[Dic
 
     fallback.append({
         "name": "Monitor for changes",
+        "name_mk": "Следи ги промените",
         "description": (
             f"Keep track of any changes in size, shape, or color of the area "
             f"associated with {condition_name}, and take a dated photo for comparison."
+        ),
+        "description_mk": (
+            f"Следи ги промените во големина, облик или боја на подрачјето "
+            f"поврзано со {condition_name}, и направи датирана фотографија за споредба."
         ),
         "type": "SELF_CARE",
     })
@@ -196,14 +246,13 @@ def generate_recommendations_with_gemini(
     if not api_key:
         raise ValueError("GEMINI_API_KEY is missing. Check your .env file.")
 
-    client = genai.Client(api_key=api_key)
-
     prompt = build_recommendation_prompt(
         condition_name=condition_name,
         severity=severity,
     )
 
     try:
+        client = _make_client(api_key)
         response = _generate_content_with_retry(
             client,
             prompt,
@@ -299,6 +348,10 @@ Rules:
 - Only answer questions related to this skin condition, general dermatology,
   or skin health. If the question is unrelated to these topics, politely
   decline and redirect the user back to the topic.
+- ALWAYS answer in the same language the user's question below is written
+  in (e.g. if it's in Macedonian, answer in Macedonian; if English, answer
+  in English), regardless of what language the condition name/description
+  above are in.
 - Keep answers concise and in plain, accessible language (roughly 2-5
   sentences).
 - If the question implies urgency (bleeding, rapid change, pain) or the
@@ -327,8 +380,6 @@ def generate_chat_answer(
     if not api_key:
         raise ValueError("GEMINI_API_KEY is missing. Check your .env file.")
 
-    client = genai.Client(api_key=api_key)
-
     prompt = build_chat_prompt(
         condition_name=condition_name,
         severity=severity,
@@ -338,6 +389,7 @@ def generate_chat_answer(
     )
 
     try:
+        client = _make_client(api_key)
         response = _generate_content_with_retry(
             client,
             prompt,
