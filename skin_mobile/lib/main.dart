@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/auth_provider.dart';
+import 'providers/locale_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -22,6 +23,7 @@ class DermaScanApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
@@ -65,7 +67,8 @@ class _AppStartState extends State<_AppStart> {
   Future<void> _init() async {
     final auth = context.read<AuthProvider>();
     final themeProvider = context.read<ThemeProvider>();
-    await Future.wait([auth.bootstrap(), themeProvider.load()]);
+    final localeProvider = context.read<LocaleProvider>();
+    await Future.wait([auth.bootstrap(), themeProvider.load(), localeProvider.load()]);
     if (!mounted) return;
     final loggedIn = auth.status == AuthStatus.authenticated;
     Navigator.of(context).pushReplacementNamed(loggedIn ? '/home' : '/onboarding');

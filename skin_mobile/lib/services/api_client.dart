@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_config.dart';
+import 'locale_storage.dart';
 
 /// Thrown whenever the API returns a non-2xx status code, or when the
 /// request fails at the network layer.
@@ -61,7 +62,16 @@ class TokenStorage {
 /// `Authorization: Bearer <access>` header for authenticated requests,
 /// and throwing [ApiException] on non-2xx responses or network errors.
 class ApiClient {
-  static Uri _uri(String path) => Uri.parse('$kApiBaseUrl$path');
+  // Attaches the current UI language (see LocaleStorage/LocaleProvider) to
+  // every request as ?lang=en|mk, mirroring skin_web/src/services/api.js's
+  // axios interceptor - so condition/recommendation text comes back in
+  // whichever language the user has selected in Profile.
+  static Uri _uri(String path) {
+    final uri = Uri.parse('$kApiBaseUrl$path');
+    return uri.replace(
+      queryParameters: {...uri.queryParameters, 'lang': LocaleStorage.current},
+    );
+  }
 
   static Future<Map<String, String>> _headers({
     required bool auth,
