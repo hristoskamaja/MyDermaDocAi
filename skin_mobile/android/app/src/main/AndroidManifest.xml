@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Used by dermatologist_list_screen.dart (via the geolocator package)
+         to sort "find a dermatologist" results by real distance. Coarse is
+         enough for city-scale sorting, but we request fine too since it's
+         also a common default and costs nothing extra to declare. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <application
         android:label="DermaScanAI"
         android:name="${applicationName}"
