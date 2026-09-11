@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/locale_context.dart';
 import '../models/analysis.dart';
 import '../services/analysis_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/page_hero_header.dart';
 import '../widgets/severity_pill.dart';
 import 'analysis_detail_screen.dart';
 
@@ -49,7 +51,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final c = context.colors;
     return Scaffold(
       backgroundColor: c.background,
-      appBar: AppBar(title: const Text('History')),
+      appBar: PageHeroHeader(
+        title: context.tr('history.title'),
+        subtitle: context.tr('history.subtitle'),
+      ),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: FutureBuilder<List<AnalysisListItem>>(
@@ -69,7 +74,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         Icon(Icons.error_outline_rounded, color: c.high, size: 36),
                         const SizedBox(height: 12),
                         Text(
-                          'Could not load your scan history.\n${snapshot.error}',
+                          '${context.tr('history.loadError')}\n${snapshot.error}',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: c.textMuted),
                         ),
@@ -91,7 +96,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         Icon(Icons.history_rounded, color: c.textLight, size: 36),
                         const SizedBox(height: 12),
                         Text(
-                          'No scans yet. Your scan history will appear here.',
+                          context.tr('history.empty'),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: c.textMuted),
                         ),

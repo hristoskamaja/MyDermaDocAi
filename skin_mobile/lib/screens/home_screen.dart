@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/locale_context.dart';
 import '../models/analysis.dart';
 import '../providers/auth_provider.dart';
 import '../services/analysis_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/hero_wave.dart';
 import '../widgets/severity_pill.dart';
 import 'dermatologist_list_screen.dart';
 import 'scan/scan_flow_screen.dart';
@@ -87,39 +89,54 @@ class _HomeScreenState extends State<HomeScreen> {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 56),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [c.primary, c.primaryDeep],
+        ClipPath(
+          clipper: const HeroWaveClipper(),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(24, 26, 24, 84),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [c.primary, c.primaryDeep],
+              ),
             ),
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(28),
-              bottomRight: Radius.circular(28),
-            ),
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                Text(
-                  'Hello, $greetName',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                  ),
+                const Positioned.fill(
+                  child: CustomPaint(painter: HeroDotsPainter()),
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'How does your skin look today?',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 15,
+                SafeArea(
+                  bottom: false,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${context.tr('home.greeting')} $greetName',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              context.tr('home.subtitle'),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      _HeroIllustration(c: c),
+                    ],
                   ),
                 ),
               ],
@@ -166,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Scan your skin',
+                            context.tr('home.scanCardTitle'),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
@@ -175,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Camera or gallery',
+                            context.tr('home.scanCardSub'),
                             style: TextStyle(fontSize: 13, color: c.textMuted),
                           ),
                         ],
@@ -199,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recent scans',
+            context.tr('home.recentScans'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: c.text),
           ),
           const SizedBox(height: 12),
@@ -213,11 +230,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
               if (snapshot.hasError) {
-                return _infoBox(c, 'Could not load your recent scans.\n${snapshot.error}');
+                return _infoBox(c, '${context.tr('home.recentError')}\n${snapshot.error}');
               }
               final items = snapshot.data ?? [];
               if (items.isEmpty) {
-                return _infoBox(c, 'No scans yet. Take your first scan to see results here.');
+                return _infoBox(c, context.tr('home.recentEmpty'));
               }
               return Column(
                 children: items.map((a) => _scanRow(c, a)).toList(),
@@ -301,9 +318,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: c.surface,
+              color: c.primarySoft,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: c.border),
+              border: Border.all(color: c.primary.withOpacity(0.35), width: 1.4),
             ),
             child: Row(
               children: [
@@ -311,10 +328,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: c.primarySoft,
+                    color: c.primary,
                     borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: c.primary.withOpacity(0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: Icon(Icons.person_search_rounded, color: c.primary, size: 22),
+                  child: const Icon(Icons.person_search_rounded, color: Colors.white, size: 22),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -322,22 +346,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Find a dermatologist',
+                        context.tr('home.findDermatologistTitle'),
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                           color: c.text,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Browse our curated list',
+                        context.tr('home.findDermatologistSub'),
                         style: TextStyle(fontSize: 12.5, color: c.textMuted),
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios_rounded, color: c.textLight, size: 16),
+                Icon(Icons.arrow_forward_ios_rounded, color: c.primary, size: 16),
               ],
             ),
           ),
@@ -362,20 +386,20 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Better photos, better estimates',
+            context.tr('home.tipsTitle'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: c.text),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
-                child: _tipCard(c, Icons.wb_sunny_rounded, 'Good lighting',
-                    'Scan in natural daylight, avoid harsh shadows.'),
+                child: _tipCard(c, Icons.wb_sunny_rounded, context.tr('home.tipLightingTitle'),
+                    context.tr('home.tipLightingBody')),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _tipCard(c, Icons.crop_free_rounded, 'Fill the frame',
-                    'Get close so the lesion fills most of the photo.'),
+                child: _tipCard(c, Icons.crop_free_rounded, context.tr('home.tipFrameTitle'),
+                    context.tr('home.tipFrameBody')),
               ),
             ],
           ),
@@ -399,6 +423,70 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(title, style: TextStyle(fontWeight: FontWeight.w700, color: c.text, fontSize: 13)),
           const SizedBox(height: 4),
           Text(body, style: TextStyle(color: c.textMuted, fontSize: 12, height: 1.3)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Small magnifying-glass-over-skin motif for the home hero, mirroring the
+/// web app's HeroIllustration (skin_web/src/pages/Home/Home.jsx) in a
+/// mobile-sized footprint - a white circular badge with a camera glyph plus
+/// two accent dots (med/low), echoing the skin-spot theme.
+class _HeroIllustration extends StatelessWidget {
+  final AppColors c;
+  const _HeroIllustration({required this.c});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 84,
+      height: 84,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 84,
+            height: 84,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(Icons.camera_alt_rounded, color: c.primary, size: 34),
+          ),
+          Positioned(
+            top: -4,
+            right: -4,
+            child: Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                color: c.med,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: -8,
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: c.low,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../l10n/locale_context.dart';
 import '../models/dermatologist.dart';
 import '../services/dermatologist_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/page_hero_header.dart';
 
 /// Simple, read-only list of dermatologists. The list itself is maintained
 /// by hand by an admin through the React admin panel - nothing here is
@@ -53,13 +55,13 @@ class _DermatologistListScreenState extends State<DermatologistListScreen> {
       final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!ok && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open that link.')),
+          SnackBar(content: Text(context.tr('findDermatologist.linkError'))),
         );
       }
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open that link.')),
+        SnackBar(content: Text(context.tr('findDermatologist.linkError'))),
       );
     }
   }
@@ -69,7 +71,11 @@ class _DermatologistListScreenState extends State<DermatologistListScreen> {
     final c = context.colors;
     return Scaffold(
       backgroundColor: c.background,
-      appBar: AppBar(title: const Text('Find a dermatologist')),
+      appBar: PageHeroHeader(
+        title: context.tr('findDermatologist.title'),
+        subtitle: context.tr('findDermatologist.subtitle'),
+        showBackButton: true,
+      ),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: FutureBuilder<List<Dermatologist>>(
@@ -83,7 +89,7 @@ class _DermatologistListScreenState extends State<DermatologistListScreen> {
                 c,
                 icon: Icons.error_outline_rounded,
                 iconColor: c.high,
-                text: 'Could not load the dermatologist directory.\n'
+                text: '${context.tr('findDermatologist.loadError')}\n'
                     '${snapshot.error}',
               );
             }
@@ -93,15 +99,14 @@ class _DermatologistListScreenState extends State<DermatologistListScreen> {
                 c,
                 icon: Icons.person_search_rounded,
                 iconColor: c.textLight,
-                text: "Your admin hasn't added any dermatologists to this "
-                    'list yet.',
+                text: context.tr('findDermatologist.empty'),
               );
             }
             return ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(20),
               itemCount: items.length,
-              itemBuilder: (context, index) => _dermatologistCard(c, items[index]),
+              itemBuilder: (context, index) => _dermatologistCard(context, c, items[index]),
             );
           },
         ),
@@ -136,7 +141,7 @@ class _DermatologistListScreenState extends State<DermatologistListScreen> {
     );
   }
 
-  Widget _dermatologistCard(AppColors c, Dermatologist d) {
+  Widget _dermatologistCard(BuildContext context, AppColors c, Dermatologist d) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -208,7 +213,7 @@ class _DermatologistListScreenState extends State<DermatologistListScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => _call(d.phone!),
                       icon: const Icon(Icons.call_rounded, size: 17),
-                      label: const Text('Call'),
+                      label: Text(context.tr('findDermatologist.call')),
                     ),
                   ),
                 if (d.phone != null &&
@@ -221,7 +226,7 @@ class _DermatologistListScreenState extends State<DermatologistListScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => _openWebsite(d.website!),
                       icon: const Icon(Icons.link_rounded, size: 17),
-                      label: const Text('Website'),
+                      label: Text(context.tr('findDermatologist.website')),
                     ),
                   ),
               ],

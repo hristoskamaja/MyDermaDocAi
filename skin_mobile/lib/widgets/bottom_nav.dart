@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/locale_context.dart';
 import '../theme/app_theme.dart';
 
 /// Persistent bottom navigation bar shown on Home / History / Profile.
@@ -29,22 +30,22 @@ class AppBottomNav extends StatelessWidget {
           onTap: onTap,
           backgroundColor: c.surface,
           elevation: 0,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              label: 'Home',
+              icon: const Icon(Icons.home_rounded),
+              label: context.tr('nav.home'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.camera_alt_rounded),
-              label: 'Scan',
+              icon: const Icon(Icons.camera_alt_rounded),
+              label: context.tr('nav.scan'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.history_rounded),
-              label: 'History',
+              icon: const Icon(Icons.history_rounded),
+              label: context.tr('nav.history'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_rounded),
-              label: 'Profile',
+              icon: const Icon(Icons.person_rounded),
+              label: context.tr('nav.profile'),
             ),
           ],
         ),

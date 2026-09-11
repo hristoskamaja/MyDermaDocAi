@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/locale_context.dart';
 import '../theme/app_theme.dart';
 
 /// Small rounded pill showing a severity level (LOW/MEDIUM/HIGH) with the
@@ -21,21 +22,21 @@ class SeverityPill extends StatelessWidget {
     final c = context.colors;
 
     if (isUncertain) {
-      return _pill('Uncertain', c.uncertain, c.uncertainSoft);
+      return _pill(context.tr('severity.uncertain'), c.uncertain, c.uncertainSoft);
     }
 
     final colors = AppColors.severityColors(c, severity);
-    return _pill(_label(severity), colors[0], colors[1]);
+    return _pill(_label(context, severity), colors[0], colors[1]);
   }
 
-  String _label(String s) {
+  String _label(BuildContext context, String s) {
     switch (s.toUpperCase()) {
       case 'HIGH':
-        return 'High';
+        return context.tr('severity.high');
       case 'MEDIUM':
-        return 'Medium';
+        return context.tr('severity.medium');
       case 'LOW':
-        return 'Low';
+        return context.tr('severity.low');
       default:
         return s;
     }

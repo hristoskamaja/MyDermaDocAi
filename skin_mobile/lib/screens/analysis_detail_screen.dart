@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/locale_context.dart';
 import '../models/analysis.dart';
 import '../models/recommendation.dart';
 import '../services/analysis_service.dart';
@@ -51,7 +52,7 @@ class _AnalysisDetailScreenState extends State<AnalysisDetailScreen> {
     final c = context.colors;
     return Scaffold(
       backgroundColor: c.background,
-      appBar: AppBar(title: const Text('Scan details')),
+      appBar: AppBar(title: Text(context.tr('result.scanDetailsTitle'))),
       body: FutureBuilder<_DetailData>(
         future: _future,
         builder: (context, snapshot) {
@@ -61,7 +62,7 @@ class _AnalysisDetailScreenState extends State<AnalysisDetailScreen> {
           if (snapshot.hasError) {
             final message = snapshot.error is ApiException
                 ? (snapshot.error as ApiException).message
-                : 'Could not load this scan.';
+                : context.tr('result.loadError');
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -74,7 +75,7 @@ class _AnalysisDetailScreenState extends State<AnalysisDetailScreen> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => setState(() => _future = _load()),
-                      child: const Text('Retry'),
+                      child: Text(context.tr('common.retry')),
                     ),
                   ],
                 ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/locale_context.dart';
 import '../providers/auth_provider.dart';
+import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/page_hero_header.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -24,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
             return AlertDialog(
               backgroundColor: c.surface,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: const Text('Change password'),
+              title: Text(context.tr('profile.changePassword')),
               content: Form(
                 key: formKey,
                 child: Column(
@@ -45,17 +48,17 @@ class ProfileScreen extends StatelessWidget {
                     TextFormField(
                       controller: oldController,
                       obscureText: true,
-                      decoration: const InputDecoration(labelText: 'Current password'),
-                      validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                      decoration: InputDecoration(labelText: context.tr('profile.currentPassword')),
+                      validator: (v) => (v == null || v.isEmpty) ? context.tr('profile.required') : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: newController,
                       obscureText: true,
-                      decoration: const InputDecoration(labelText: 'New password'),
+                      decoration: InputDecoration(labelText: context.tr('profile.newPassword')),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Required';
-                        if (v.length < 8) return 'At least 8 characters';
+                        if (v == null || v.isEmpty) return context.tr('profile.required');
+                        if (v.length < 8) return context.tr('profile.atLeast8');
                         return null;
                       },
                     ),
@@ -65,7 +68,7 @@ class ProfileScreen extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: loading ? null : () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Cancel'),
+                  child: Text(context.tr('profile.cancel')),
                 ),
                 ElevatedButton(
                   onPressed: loading
@@ -85,7 +88,7 @@ class ProfileScreen extends StatelessWidget {
                             if (dialogContext.mounted) Navigator.of(dialogContext).pop();
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Password changed successfully.')),
+                                SnackBar(content: Text(context.tr('profile.pwSuccess'))),
                               );
                             }
                           } else {
@@ -101,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2.2, color: Colors.white),
                         )
-                      : const Text('Save'),
+                      : Text(context.tr('profile.save')),
                 ),
               ],
             );
@@ -116,11 +119,15 @@ class ProfileScreen extends StatelessWidget {
     final c = context.colors;
     final auth = context.watch<AuthProvider>();
     final themeProvider = context.watch<ThemeProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
     final user = auth.currentUser;
 
     return Scaffold(
       backgroundColor: c.background,
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: PageHeroHeader(
+        title: context.tr('profile.title'),
+        subtitle: context.tr('profile.subtitle'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -169,16 +176,23 @@ class ProfileScreen extends StatelessWidget {
               _settingsTile(
                 c,
                 icon: Icons.lock_outline_rounded,
-                title: 'Change password',
+                title: context.tr('profile.changePassword'),
                 onTap: () => _showChangePasswordDialog(context),
               ),
               Divider(color: c.border, height: 1),
               _settingsSwitchTile(
                 c,
                 icon: Icons.dark_mode_outlined,
-                title: 'Dark theme',
+                title: context.tr('profile.darkTheme'),
                 value: themeProvider.isDark,
                 onChanged: (v) => themeProvider.setDark(v),
+              ),
+              Divider(color: c.border, height: 1),
+              _settingsLanguageTile(
+                c,
+                title: context.tr('profile.language'),
+                value: localeProvider.lang,
+                onChanged: (lang) => localeProvider.setLang(lang),
               ),
             ],
           ),
@@ -193,7 +207,7 @@ class ProfileScreen extends StatelessWidget {
                 }
               },
               icon: Icon(Icons.logout_rounded, color: c.high),
-              label: Text('Log out', style: TextStyle(color: c.high)),
+              label: Text(context.tr('profile.logout'), style: TextStyle(color: c.high)),
               style: OutlinedButton.styleFrom(side: BorderSide(color: c.high.withOpacity(0.4))),
             ),
           ),
@@ -238,6 +252,56 @@ class ProfileScreen extends StatelessWidget {
       leading: Icon(icon, color: c.primary),
       title: Text(title, style: TextStyle(color: c.text, fontWeight: FontWeight.w600)),
       trailing: Switch(value: value, onChanged: onChanged, activeColor: c.primary),
+    );
+  }
+
+  /// EN/MK pill toggle - the Flutter counterpart of the web app's
+  /// PatientLayout language switch (.patient-lang-switch).
+  Widget _settingsLanguageTile(
+    AppColors c, {
+    required String title,
+    required String value,
+    required ValueChanged<String> onChanged,
+  }) {
+    return ListTile(
+      leading: Icon(Icons.translate_rounded, color: c.primary),
+      title: Text(title, style: TextStyle(color: c.text, fontWeight: FontWeight.w600)),
+      trailing: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: c.surface2,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _langPillBtn(c, 'EN', value == 'en', () => onChanged('en')),
+            _langPillBtn(c, 'MK', value == 'mk', () => onChanged('mk')),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _langPillBtn(AppColors c, String label, bool active, VoidCallback onTap) {
+    return Material(
+      color: active ? c.surface : Colors.transparent,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: active ? c.primary : c.textMuted,
+              fontWeight: FontWeight.w700,
+              fontSize: 11.5,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

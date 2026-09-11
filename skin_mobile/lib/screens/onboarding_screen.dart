@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/locale_context.dart';
 import '../theme/app_theme.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -51,8 +52,7 @@ class OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                'Scan your skin, get an instant AI estimate, and know when '
-                "it's time to see a dermatologist.",
+                context.tr('onboarding.tagline'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -67,12 +67,12 @@ class OnboardingScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pushReplacementNamed('/login');
                   },
-                  child: const Text('Get Started'),
+                  child: Text(context.tr('onboarding.getStarted')),
                 ),
               ),
               const SizedBox(height: 18),
               Text(
-                'Not a substitute for professional medical advice.',
+                context.tr('onboarding.disclaimer'),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12, color: c.textLight),
               ),

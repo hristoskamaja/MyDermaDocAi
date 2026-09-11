@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../l10n/locale_context.dart';
 import '../../models/analysis.dart';
 import '../../models/recommendation.dart';
 import '../../services/analysis_service.dart';
@@ -48,7 +49,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not access camera/gallery: $e')),
+        SnackBar(content: Text('${context.tr('scan.cameraError')} $e')),
       );
     }
   }
@@ -88,7 +89,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Something went wrong while analyzing your photo.';
+        _errorMessage = context.tr('scan.genericError');
         _stage = _ScanStage.error;
       });
     }
@@ -118,7 +119,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
     return Scaffold(
       backgroundColor: c.background,
       appBar: AppBar(
-        title: const Text('Scan'),
+        title: Text(context.tr('nav.scan')),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).maybePop(),
@@ -145,7 +146,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
           symptoms: analysis.condition.symptoms,
           treatmentOverview: analysis.condition.treatmentOverview,
           recommendations: _recommendations,
-          primaryActionLabel: 'Scan again',
+          primaryActionLabel: context.tr('scan.scanAgain'),
           onPrimaryAction: _reset,
           trailing: AnalysisChatSection(analysisId: analysis.id),
         );
@@ -190,12 +191,12 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
                           Icon(Icons.photo_camera_rounded, size: 56, color: c.textLight),
                           const SizedBox(height: 12),
                           Text(
-                            'No photo yet',
+                            context.tr('scan.noPhoto'),
                             style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Center the lesion and hold steady',
+                            context.tr('scan.captureHint'),
                             style: TextStyle(color: c.textLight, fontSize: 12),
                           ),
                         ],
@@ -210,7 +211,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
               child: ElevatedButton.icon(
                 onPressed: _submitScan,
                 icon: const Icon(Icons.check_rounded),
-                label: const Text('Use this photo'),
+                label: Text(context.tr('scan.usePhoto')),
               ),
             ),
             const SizedBox(height: 12),
@@ -219,7 +220,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _pickImage(ImageSource.camera),
                 icon: const Icon(Icons.replay_rounded),
-                label: const Text('Retake'),
+                label: Text(context.tr('scan.retake')),
               ),
             ),
           ] else ...[
@@ -228,7 +229,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
               child: ElevatedButton.icon(
                 onPressed: () => _pickImage(ImageSource.camera),
                 icon: const Icon(Icons.camera_alt_rounded),
-                label: const Text('Capture'),
+                label: Text(context.tr('scan.capture')),
               ),
             ),
             const SizedBox(height: 12),
@@ -237,7 +238,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _pickImage(ImageSource.gallery),
                 icon: const Icon(Icons.photo_library_rounded),
-                label: const Text('Gallery'),
+                label: Text(context.tr('scan.gallery')),
               ),
             ),
           ],
@@ -254,7 +255,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
           CircularProgressIndicator(color: c.primary),
           const SizedBox(height: 20),
           Text(
-            'Analyzing your photo…',
+            context.tr('scan.analyzing'),
             style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600),
           ),
         ],
@@ -276,13 +277,13 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
           ),
           const SizedBox(height: 20),
           Text(
-            'We could not analyze that photo',
+            context.tr('scan.errorTitle'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: c.text),
           ),
           const SizedBox(height: 8),
           Text(
-            _errorMessage ?? 'Please try again.',
+            _errorMessage ?? context.tr('scan.errorDefault'),
             textAlign: TextAlign.center,
             style: TextStyle(color: c.textMuted, fontSize: 14, height: 1.4),
           ),
@@ -291,7 +292,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _retry,
-              child: const Text('Retry'),
+              child: Text(context.tr('common.retry')),
             ),
           ),
           const SizedBox(height: 12),
@@ -299,7 +300,7 @@ class _ScanFlowScreenState extends State<ScanFlowScreen> {
             width: double.infinity,
             child: OutlinedButton(
               onPressed: _reset,
-              child: const Text('Choose a different photo'),
+              child: Text(context.tr('scan.chooseDifferent')),
             ),
           ),
         ],

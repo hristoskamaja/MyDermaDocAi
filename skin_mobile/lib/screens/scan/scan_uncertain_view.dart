@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/locale_context.dart';
 import '../../theme/app_theme.dart';
 
 /// Visually distinct "low confidence" result state. Uses the `uncertain`
@@ -61,7 +62,7 @@ class ScanUncertainView extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        "We're not confident about this one",
+                        context.tr('uncertain.title'),
                         style: TextStyle(
                           color: c.uncertain,
                           fontWeight: FontWeight.w800,
@@ -73,10 +74,7 @@ class ScanUncertainView extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'The model could not identify this lesion with enough '
-                  'certainty to give a reliable estimate. Try retaking the '
-                  'photo in better lighting, or have it reviewed by a '
-                  'professional.',
+                  context.tr('uncertain.body'),
                   style: TextStyle(color: c.text, fontSize: 13.5, height: 1.5),
                 ),
                 const SizedBox(height: 18),
@@ -93,7 +91,7 @@ class ScanUncertainView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Best guess',
+                              context.tr('uncertain.bestGuess'),
                               style: TextStyle(color: c.textMuted, fontSize: 11.5),
                             ),
                             const SizedBox(height: 2),
@@ -127,7 +125,7 @@ class ScanUncertainView extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: onRescan,
-              child: const Text('Rescan'),
+              child: Text(context.tr('uncertain.rescan')),
             ),
           ),
           const SizedBox(height: 12),
@@ -135,7 +133,7 @@ class ScanUncertainView extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton(
               onPressed: onFindDermatologist,
-              child: const Text('Find a dermatologist'),
+              child: Text(context.tr('findDermatologist.title')),
             ),
           ),
         ],

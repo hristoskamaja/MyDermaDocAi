@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/locale_context.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 
@@ -42,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (ok) {
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (r) => false);
     } else {
-      setState(() => _error = auth.lastError ?? 'Login failed. Please try again.');
+      setState(() => _error = auth.lastError ?? context.tr('auth.loginFailed'));
     }
   }
 
@@ -60,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back',
+                  context.tr('auth.loginTitle'),
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
@@ -69,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to continue tracking your skin health.',
+                  context.tr('auth.loginSubtitle'),
                   style: TextStyle(fontSize: 15, color: c.textMuted),
                 ),
                 const SizedBox(height: 32),
@@ -88,20 +89,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                 ],
-                Text('Email', style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
+                Text(context.tr('auth.email'), style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(hintText: 'you@example.com'),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Email is required';
-                    if (!v.contains('@')) return 'Enter a valid email';
+                    if (v == null || v.trim().isEmpty) return context.tr('auth.emailRequired');
+                    if (!v.contains('@')) return context.tr('auth.emailInvalid');
                     return null;
                   },
                 ),
                 const SizedBox(height: 18),
-                Text('Password', style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
+                Text(context.tr('auth.password'), style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _passwordController,
@@ -114,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Password is required';
+                    if (v == null || v.isEmpty) return context.tr('auth.passwordRequired');
                     return null;
                   },
                 ),
@@ -132,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Sign in'),
+                        : Text(context.tr('auth.signIn')),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -141,11 +142,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: () => Navigator.of(context).pushReplacementNamed('/register'),
                     child: RichText(
                       text: TextSpan(
-                        text: "Don't have an account? ",
+                        text: context.tr('auth.noAccount'),
                         style: TextStyle(color: c.textMuted),
                         children: [
                           TextSpan(
-                            text: 'Create one',
+                            text: context.tr('auth.createOne'),
                             style: TextStyle(color: c.primary, fontWeight: FontWeight.w700),
                           ),
                         ],

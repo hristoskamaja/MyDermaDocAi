@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/locale_context.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 
@@ -45,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (ok) {
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (r) => false);
     } else {
-      setState(() => _error = auth.lastError ?? 'Registration failed. Please try again.');
+      setState(() => _error = auth.lastError ?? context.tr('auth.registerFailed'));
     }
   }
 
@@ -63,7 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Create your account',
+                  context.tr('auth.registerTitle'),
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
@@ -72,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Start tracking your skin health with AI-powered scans.',
+                  context.tr('auth.registerSubtitle'),
                   style: TextStyle(fontSize: 15, color: c.textMuted),
                 ),
                 const SizedBox(height: 32),
@@ -91,45 +92,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 20),
                 ],
-                Text('Full name', style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
+                Text(context.tr('auth.fullName'), style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(hintText: 'Jane Doe'),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Full name is required';
+                    if (v == null || v.trim().isEmpty) return context.tr('auth.fullNameRequired');
                     return null;
                   },
                 ),
                 const SizedBox(height: 18),
-                Text('Email', style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
+                Text(context.tr('auth.email'), style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(hintText: 'you@example.com'),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Email is required';
-                    if (!v.contains('@')) return 'Enter a valid email';
+                    if (v == null || v.trim().isEmpty) return context.tr('auth.emailRequired');
+                    if (!v.contains('@')) return context.tr('auth.emailInvalid');
                     return null;
                   },
                 ),
                 const SizedBox(height: 18),
-                Text('Password', style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
+                Text(context.tr('auth.password'), style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscure,
                   decoration: InputDecoration(
-                    hintText: 'At least 8 characters',
+                    hintText: context.tr('auth.passwordMinHint'),
                     suffixIcon: IconButton(
                       icon: Icon(_obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Password is required';
-                    if (v.length < 8) return 'Use at least 8 characters';
+                    if (v == null || v.isEmpty) return context.tr('auth.passwordRequired');
+                    if (v.length < 8) return context.tr('auth.passwordMin');
                     return null;
                   },
                 ),
@@ -147,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Create account'),
+                        : Text(context.tr('auth.createAccount')),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -156,11 +157,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onTap: () => Navigator.of(context).pushReplacementNamed('/login'),
                     child: RichText(
                       text: TextSpan(
-                        text: 'Already have an account? ',
+                        text: context.tr('auth.haveAccount'),
                         style: TextStyle(color: c.textMuted),
                         children: [
                           TextSpan(
-                            text: 'Sign in',
+                            text: context.tr('auth.signIn'),
                             style: TextStyle(color: c.primary, fontWeight: FontWeight.w700),
                           ),
                         ],

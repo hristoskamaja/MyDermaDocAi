@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/locale_context.dart';
 import '../models/chat_message.dart';
 import '../services/analysis_service.dart';
 import '../services/api_client.dart';
@@ -89,7 +90,7 @@ class _AnalysisChatSectionState extends State<AnalysisChatSection> {
       if (!mounted) return;
       setState(() {
         _sending = false;
-        _error = 'Something went wrong. Please try again.';
+        _error = context.tr('common.somethingWrong');
       });
     }
   }
@@ -102,7 +103,7 @@ class _AnalysisChatSectionState extends State<AnalysisChatSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'ASK ABOUT THIS RESULT',
+          context.tr('chat.title'),
           style: TextStyle(
             color: c.textMuted,
             fontWeight: FontWeight.w800,
@@ -112,8 +113,7 @@ class _AnalysisChatSectionState extends State<AnalysisChatSection> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Ask a general question about this condition. This is AI-generated '
-          'information, not a diagnosis or personal medical advice.',
+          context.tr('chat.subtitle'),
           style: TextStyle(color: c.textLight, fontSize: 12, height: 1.4),
         ),
         const SizedBox(height: 14),
@@ -150,7 +150,7 @@ class _AnalysisChatSectionState extends State<AnalysisChatSection> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Thinking…',
+                  context.tr('chat.thinking'),
                   style: TextStyle(color: c.textMuted, fontSize: 12.5),
                 ),
               ],
@@ -173,8 +173,8 @@ class _AnalysisChatSectionState extends State<AnalysisChatSection> {
                 minLines: 1,
                 maxLines: 4,
                 enabled: !_sending,
-                decoration: const InputDecoration(
-                  hintText: 'e.g. What could cause this to change?',
+                decoration: InputDecoration(
+                  hintText: context.tr('chat.placeholder'),
                 ),
                 onSubmitted: (_) => _send(),
               ),
