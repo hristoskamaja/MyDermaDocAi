@@ -1,3 +1,6 @@
+import threading
+
+from django.db import close_old_connections
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
@@ -7,7 +10,85 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import SkinCondition, Recommendation, ConditionRecommendation, Dermatologist
-from .serializers import SkinConditionSerializer, RecommendationSerializer, DermatologistSerializer
+from .serializers import (
+    SkinConditionSerializer,
+    RecommendationSerializer,
+    LocalizedRecommendationSerializer,
+    DermatologistSerializer,
+)
+from .services.translation import fill_missing_translations
+
+# The three fields that get an auto-generated English counterpart - see
+# core/services/translation.py. Kept as one tuple so the "did the source
+# text change, so the _en translation needs regenerating" check below and
+# fill_missing_translations() can't drift out of sync with each other.
+TRANSLATED_FIELD_PAIRS = [
+    ("description", "description_en"),
+    ("symptoms", "symptoms_en"),
+    ("treatment_overview", "treatment_overview_en"),
+]
+
+
+def sync_condition_translations(condition, previous_values=None, protected_fields=None):
+    """
+    Clears any English field whose Macedonian source just changed (so it
+    doesn't keep showing a translation of the *old* text), then fills in
+    whatever's missing via Gemini, and saves if anything changed.
+
+    `previous_values` is a dict of {field: old_value}, or None for a
+    brand-new condition (nothing to compare against).
+
+    `protected_fields` is the set of _en field names the admin explicitly
+    typed a value for IN THIS SAME REQUEST (see condition_detail) - those
+    are never auto-cleared/auto-translated, so a manual English edit is
+    never silently overwritten by Gemini's version.
+    """
+    changed = False
+    protected_fields = protected_fields or set()
+
+    if previous_values is not None:
+        for source_field, target_field in TRANSLATED_FIELD_PAIRS:
+            if target_field in protected_fields:
+                continue
+            new_value = getattr(condition, source_field, None)
+            if previous_values.get(source_field) != new_value:
+                setattr(condition, target_field, None)
+                changed = True
+
+    if fill_missing_translations(condition, skip_fields=protected_fields):
+        changed = True
+
+    if changed:
+        condition.save()
+
+
+def sync_condition_translations_in_background(condition_id, previous_values=None, protected_fields=None):
+    """
+    Same as sync_condition_translations, but fired on a background thread
+    so the admin's create/save request returns immediately instead of
+    blocking on up to 3 sequential Gemini calls (one per translated field,
+    each up to ~15-20s) - that wait made every save feel like it "wasn't
+    working". The translated fields simply appear a few seconds later, the
+    next time the condition is fetched (e.g. on the next page load/save).
+
+    Re-fetches the condition by id inside the thread rather than reusing
+    the instance from the request - Django model instances aren't safe to
+    share across threads, and the DB connection used by the request thread
+    is closed once the response is sent.
+    """
+
+    def worker():
+        try:
+            condition = SkinCondition.objects.get(id=condition_id)
+            sync_condition_translations(condition, previous_values, protected_fields)
+        except SkinCondition.DoesNotExist:
+            pass
+        except Exception as error:
+            print(f"Background translation sync failed: {error}")
+        finally:
+            close_old_connections()
+
+    threading.Thread(target=worker, daemon=True).start()
 
 
 def is_admin_user(request):
@@ -60,6 +141,12 @@ def conditions_collection(request):
 
         if serializer.is_valid():
             condition = serializer.save()
+            manual_en_fields = {
+                target_field
+                for _, target_field in TRANSLATED_FIELD_PAIRS
+                if str(request.data.get(target_field, "")).strip()
+            }
+            sync_condition_translations_in_background(condition.id, protected_fields=manual_en_fields)
             return Response(
                 {
                     "message": "Condition created successfully.",
@@ -86,10 +173,23 @@ def condition_detail(request, id):
 
     if request.method in ("PUT", "PATCH"):
         partial = request.method == "PATCH"
+        previous_values = {
+            source_field: getattr(condition, source_field, None)
+            for source_field, _ in TRANSLATED_FIELD_PAIRS
+        }
+        # Any _en field the admin actually typed something into in THIS
+        # request is a manual edit - never auto-overwritten by Gemini,
+        # even if the Macedonian source also changed in the same save.
+        manual_en_fields = {
+            target_field
+            for _, target_field in TRANSLATED_FIELD_PAIRS
+            if str(request.data.get(target_field, "")).strip()
+        }
         serializer = SkinConditionSerializer(condition, data=request.data, partial=partial)
 
         if serializer.is_valid():
             condition = serializer.save()
+            sync_condition_translations_in_background(condition.id, previous_values, manual_en_fields)
             return Response(
                 {
                     "message": "Condition updated successfully.",
@@ -118,7 +218,9 @@ def condition_recommendations(request, id):
     ).values_list("recommendation_id", flat=True)
 
     recommendations = Recommendation.objects.filter(id__in=recommendation_ids)
-    serializer = RecommendationSerializer(recommendations, many=True)
+    serializer = LocalizedRecommendationSerializer(
+        recommendations, many=True, context={"request": request}
+    )
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
