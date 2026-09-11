@@ -1,18 +1,6 @@
 """
 gemini_service.py
 
-Same as in leafscan: Gemini does NOT do the classification (that's done by
-skin_model_service.py with the local model). Gemini only generates general,
-readable information/advice about the condition after it has already been
-predicted, and is called ONLY ONCE per condition (cached in the database via
-ConditionRecommendation - see views.py -> generate_recommendations_only_if_missing).
-
-DIFFERENCE from leafscan (important): instead of "treatments" (treating skin
-lesions is a medical matter - medication, biopsy, surgery - the AI must NOT
-prescribe that), this prompt asks for general self-care/lifestyle advice AND
-requires at least one recommendation of type MEDICAL_CONSULT that clearly
-recommends seeing a dermatologist. The app must never claim a definitive
-diagnosis.
 """
 
 import json
