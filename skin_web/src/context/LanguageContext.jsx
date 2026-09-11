@@ -185,6 +185,9 @@ const TRANSLATIONS = {
             emptySub:          'Check back later — this list is maintained by hand, not generated automatically.',
             call:              'Call',
             website:           'Visit website',
+            yourCity:          'Your city:',
+            anyCity:           'Any city',
+            sortedByDistance:  'Sorted by distance from your city',
         },
 
         // ── Users ─────────────────────────────────────────────────────────────────
@@ -579,6 +582,9 @@ const TRANSLATIONS = {
             emptySub:          'Проверете повторно подоцна — оваа листа се одржува рачно, не се генерира автоматски.',
             call:              'Јави се',
             website:           'Посети веб-страница',
+            yourCity:          'Твојот град:',
+            anyCity:           'Секаде',
+            sortedByDistance:  'Сортирано по близина до твојот град',
         },
 
         // ── Users ─────────────────────────────────────────────────────────────────
