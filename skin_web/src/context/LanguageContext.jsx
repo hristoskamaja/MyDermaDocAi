@@ -21,10 +21,12 @@ const TRANSLATIONS = {
             settings:        'Settings',
             profile:         'Profile',
             logout:          'Log out',
+            home:            'Home',
             scan:            'Scan',
             history:         'History',
             dermatologists:  'Dermatologists',
             findDermatologist: 'Find a Dermatologist',
+            doctorsTab:      'Doctors',
         },
 
         // ── Common ────────────────────────────────────────────────────────────────
@@ -132,6 +134,10 @@ const TRANSLATIONS = {
             createNew:         'Create new recommendation',
             noRecommendations: 'No recommendations linked yet',
             selectRecommendation: 'Select a recommendation…',
+            descriptionEn:     'Description (English)',
+            symptomsEn:        'Symptoms (English)',
+            treatmentOverviewEn: 'Treatment Overview (English)',
+            autoTranslateHint: 'Auto-translated from the Macedonian text above — leave blank to let AI fill it in, or type your own to override it.',
         },
 
         // ── Recommendations ───────────────────────────────────────────────────────
@@ -310,6 +316,31 @@ const TRANSLATIONS = {
             heroSub:           'Snap a photo of a skin concern and get an instant AI-powered assessment with care recommendations.',
         },
 
+        // ── Home ──────────────────────────────────────────────────────────────────
+        home: {
+            greetingMorning:   'Good morning',
+            greetingAfternoon: 'Good afternoon',
+            greetingEvening:   'Good evening',
+            heroTitle:         'Know your skin better',
+            heroSub:           'Snap a photo of a skin concern and get an instant AI-powered assessment with care recommendations.',
+            scanCta:           'Scan your skin',
+            scanCtaSub:        'Get an instant AI-powered check',
+            whyTitle:          'What makes DermaScanAI different',
+            feature1Title:     'Instant AI analysis',
+            feature1Sub:       'Get an AI-powered assessment in seconds from a single photo.',
+            feature2Title:     'Ask follow-up questions',
+            feature2Sub:       'Chat with our AI about your result for more clarity.',
+            feature3Title:     'Real dermatologists',
+            feature3Sub:       'Browse a curated list of dermatologists when you need expert care.',
+            activity:          'Your activity',
+            recentScans:       'Recent scans',
+            scansUnit:         'scans',
+            findDermatologist: 'Find a dermatologist',
+            findDermatologistSub: 'Browse our list',
+            latestResult:      'Latest result',
+            tip:               'Tip: sunscreen reduces the risk of new sun-related skin changes, even on cloudy days.',
+        },
+
         // ── Scan ──────────────────────────────────────────────────────────────────
         scan: {
             title:             'Scan your skin',
@@ -330,6 +361,7 @@ const TRANSLATIONS = {
 
         // ── Scan Result ──────────────────────────────────────────────────────────
         result: {
+            scanResult:        'Scan result',
             confidence:        'Confidence',
             description:       'Description',
             symptoms:          'Symptoms',
@@ -383,10 +415,12 @@ const TRANSLATIONS = {
             settings:        'Поставки',
             profile:         'Профил',
             logout:          'Одјава',
+            home:            'Почетна',
             scan:            'Скенирај',
             history:         'Историја',
             dermatologists:  'Дерматолози',
             findDermatologist: 'Најди дерматолог',
+            doctorsTab:      'Доктори',
         },
 
         // ── Common ────────────────────────────────────────────────────────────────
@@ -494,6 +528,10 @@ const TRANSLATIONS = {
             createNew:         'Креирај нова препорака',
             noRecommendations: 'Нема поврзани препораки',
             selectRecommendation: 'Изберете препорака…',
+            descriptionEn:     'Опис (англиски)',
+            symptomsEn:        'Симптоми (англиски)',
+            treatmentOverviewEn: 'Преглед на третман (англиски)',
+            autoTranslateHint: 'Автоматски преведено од македонскиот текст погоре — остави празно за AI да го пополни, или впиши свој текст за да го замениш.',
         },
 
         // ── Recommendations ───────────────────────────────────────────────────────
@@ -672,6 +710,31 @@ const TRANSLATIONS = {
             heroSub:           'Сликај ја проблематичната зона и добиј моментална AI проценка со препораки за нега.',
         },
 
+        // ── Home ──────────────────────────────────────────────────────────────────
+        home: {
+            greetingMorning:   'Добро утро',
+            greetingAfternoon: 'Добар ден',
+            greetingEvening:   'Добра вечер',
+            heroTitle:         'Запознај ја твојата кожа подобро',
+            heroSub:           'Сликај ја проблематичната зона и добиј моментална AI проценка со препораки за нега.',
+            scanCta:           'Скенирај ја кожата',
+            scanCtaSub:        'Добиј моментална AI проверка',
+            whyTitle:          'Што го издвојува DermaScanAI',
+            feature1Title:     'Моментална AI анализа',
+            feature1Sub:       'Добиј AI проценка за неколку секунди од само една слика.',
+            feature2Title:     'Постави дополнителни прашања',
+            feature2Sub:       'Разговарај со нашиот AI за твојот резултат за поголема јасност.',
+            feature3Title:     'Вистински дерматолози',
+            feature3Sub:       'Прегледај подготвена листа на дерматолози кога ти треба стручна помош.',
+            activity:          'Твојата активност',
+            recentScans:       'Скорешни скенирања',
+            scansUnit:         'скенирања',
+            findDermatologist: 'Најди дерматолог',
+            findDermatologistSub: 'Прегледај ја листата',
+            latestResult:      'Последен резултат',
+            tip:               'Совет: кремот за сончање го намалува ризикот од нови промени на кожата предизвикани од сонце, дури и кога е облачно.',
+        },
+
         // ── Scan ──────────────────────────────────────────────────────────────────
         scan: {
             title:             'Скенирај ја твојата кожа',
@@ -692,6 +755,7 @@ const TRANSLATIONS = {
 
         // ── Scan Result ──────────────────────────────────────────────────────────
         result: {
+            scanResult:        'Резултат од скенирање',
             confidence:        'Доверливост',
             description:       'Опис',
             symptoms:          'Симптоми',

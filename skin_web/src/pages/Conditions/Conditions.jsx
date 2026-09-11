@@ -28,8 +28,11 @@ const EMPTY_FORM = {
     category: 'BENIGN',
     severity: 'MEDIUM',
     description: '',
+    description_en: '',
     symptoms: '',
+    symptoms_en: '',
     treatment_overview: '',
+    treatment_overview_en: '',
     image_description: '',
 };
 
@@ -341,8 +344,11 @@ function FormModal({ condition, onSave, onClose, t }) {
                 category:          condition.category           || 'BENIGN',
                 severity:          condition.severity           || 'MEDIUM',
                 description:       condition.description        || '',
+                description_en:    condition.description_en     || '',
                 symptoms:          condition.symptoms           || '',
+                symptoms_en:       condition.symptoms_en        || '',
                 treatment_overview: condition.treatment_overview || '',
+                treatment_overview_en: condition.treatment_overview_en || '',
                 image_description: condition.image_description  || '',
             }
             : { ...EMPTY_FORM }
@@ -386,8 +392,11 @@ function FormModal({ condition, onSave, onClose, t }) {
         formData.append('category',          form.category);
         formData.append('severity',          form.severity);
         formData.append('description',       form.description);
+        formData.append('description_en',    form.description_en);
         formData.append('symptoms',          form.symptoms);
+        formData.append('symptoms_en',       form.symptoms_en);
         formData.append('treatment_overview', form.treatment_overview);
+        formData.append('treatment_overview_en', form.treatment_overview_en);
         formData.append('image_description', form.image_description);
 
         if (imageFile) {
@@ -481,6 +490,22 @@ function FormModal({ condition, onSave, onClose, t }) {
                         {errors.description && <span className="form-error">{errors.description}</span>}
                     </div>
 
+                    {/* Description (English) - auto-translated, but editable */}
+                    <div className="form-field">
+                        <label className="form-label">
+                            {t('conditions.descriptionEn')}
+                            <span className="form-optional">({t('conditions.optional')})</span>
+                        </label>
+                        <textarea
+                            className="form-input form-textarea"
+                            rows={3}
+                            placeholder={t('conditions.autoTranslateHint')}
+                            value={form.description_en}
+                            onChange={(e) => set('description_en', e.target.value)}
+                        />
+                        <span className="form-hint">{t('conditions.autoTranslateHint')}</span>
+                    </div>
+
                     {/* Symptoms */}
                     <div className="form-field">
                         <label className="form-label">{t('conditions.symptoms')}</label>
@@ -491,6 +516,22 @@ function FormModal({ condition, onSave, onClose, t }) {
                             onChange={(e) => set('symptoms', e.target.value)}
                         />
                         {errors.symptoms && <span className="form-error">{errors.symptoms}</span>}
+                    </div>
+
+                    {/* Symptoms (English) - auto-translated, but editable */}
+                    <div className="form-field">
+                        <label className="form-label">
+                            {t('conditions.symptomsEn')}
+                            <span className="form-optional">({t('conditions.optional')})</span>
+                        </label>
+                        <textarea
+                            className="form-input form-textarea"
+                            rows={3}
+                            placeholder={t('conditions.autoTranslateHint')}
+                            value={form.symptoms_en}
+                            onChange={(e) => set('symptoms_en', e.target.value)}
+                        />
+                        <span className="form-hint">{t('conditions.autoTranslateHint')}</span>
                     </div>
 
                     {/* Treatment overview */}
@@ -505,6 +546,22 @@ function FormModal({ condition, onSave, onClose, t }) {
                             value={form.treatment_overview}
                             onChange={(e) => set('treatment_overview', e.target.value)}
                         />
+                    </div>
+
+                    {/* Treatment overview (English) - auto-translated, but editable */}
+                    <div className="form-field">
+                        <label className="form-label">
+                            {t('conditions.treatmentOverviewEn')}
+                            <span className="form-optional">({t('conditions.optional')})</span>
+                        </label>
+                        <textarea
+                            className="form-input form-textarea"
+                            rows={3}
+                            placeholder={t('conditions.autoTranslateHint')}
+                            value={form.treatment_overview_en}
+                            onChange={(e) => set('treatment_overview_en', e.target.value)}
+                        />
+                        <span className="form-hint">{t('conditions.autoTranslateHint')}</span>
                     </div>
 
                     {/* Image upload */}
